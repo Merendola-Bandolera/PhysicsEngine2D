@@ -17,12 +17,13 @@ ModulePhysics::~ModulePhysics()
 bool ModulePhysics::Start()
 {
 	LOG("Creating Physics 2D environment");
-	x = 40;
-	y = 40;
-	gravity = -9.81f;
 
-
-	
+	test.x = 0;
+	test.y = 0;    
+	test.w = 10;
+	test.h = 10;
+	test.gravity = -9.8f;
+	test.rect = {test.x, test.y, test.w,test.h};
 	
 	return true;
 }
@@ -30,9 +31,8 @@ bool ModulePhysics::Start()
 // 
 update_status ModulePhysics::PreUpdate()
 {
-	if ( y <= 400)
-	y = y - gravity;
-
+	
+	test.Gravity();
 	return UPDATE_CONTINUE;
 }
 
@@ -40,13 +40,9 @@ update_status ModulePhysics::PreUpdate()
 update_status ModulePhysics::PostUpdate()
 {
 
-	SDL_Rect rect;
-	rect.x = x;
-	rect.y = y;
-	rect.h = 10;
-	rect.w = 10;
+	test.rect = { test.x, test.y, test.w,test.h };
+	App->renderer->DrawQuad(test.rect,255,0,0,255);
 	
-	App->renderer->DrawQuad(rect, 23, 255, 45, 255);
 
 	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
 		debug = !debug;

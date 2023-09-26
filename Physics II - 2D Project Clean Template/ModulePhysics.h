@@ -13,15 +13,39 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 
+	class square
+	{
+	public:
+		int x;
+		int y;
+		int w;
+		int h;
+		int gravity;
+		int mass;
+		int speed;
+		SDL_Rect rect;
 	
 
-	int x;
-	int y;
-	int gravity;
-	int mass;
+
+		
+		void Gravity() 
+		{
+			y = y - gravity;
+		}
+
+
+	private:
+
+	
+		
+	};
+
+	
+
 
 private:
 	SDL_Renderer* renderer;
 	SDL_Rect rect;
 	bool debug;
+	square test;
 };
