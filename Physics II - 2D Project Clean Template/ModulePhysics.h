@@ -23,16 +23,33 @@ public:
 		int gravity;
 		int mass;
 		int speed;
+		float acceleration;
+		float force;
 		SDL_Rect rect;
 	
 
+		void xMovement() 
+		{
+		
 
+			x = x + speed + force;
+			
+			if (force != 0)
+				force -= 0.1f;
+		}
 		
 		void Gravity() 
 		{
 			y = y - gravity;
 		}
 
+		bool Intersects(const SDL_Rect& r) const
+		{
+			return (rect.x < r.x + r.w &&
+				rect.x + rect.w > r.x &&
+				rect.y < r.y + r.h &&
+				rect.h + rect.y > r.y);
+		}
 
 	private:
 
@@ -48,4 +65,5 @@ private:
 	SDL_Rect rect;
 	bool debug;
 	square test;
+	square floor;
 };

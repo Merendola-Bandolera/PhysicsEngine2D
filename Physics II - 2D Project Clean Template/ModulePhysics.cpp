@@ -23,8 +23,17 @@ bool ModulePhysics::Start()
 	test.w = 10;
 	test.h = 10;
 	test.gravity = -9.8f;
+	test.speed = 8;
+	test.force = 8;
 	test.rect = {test.x, test.y, test.w,test.h};
 	
+	floor.x = 0;
+	floor.y = 300;
+	floor.w = 100;
+	floor.h = 10;
+	floor.gravity = 0;
+	floor.rect = { floor.x, floor.y, floor.w,floor.h };
+
 	return true;
 }
 
@@ -32,7 +41,11 @@ bool ModulePhysics::Start()
 update_status ModulePhysics::PreUpdate()
 {
 	
+	if (!test.Intersects(floor.rect))
 	test.Gravity();
+
+	test.xMovement();
+
 	return UPDATE_CONTINUE;
 }
 
@@ -41,7 +54,8 @@ update_status ModulePhysics::PostUpdate()
 {
 
 	test.rect = { test.x, test.y, test.w,test.h };
-	App->renderer->DrawQuad(test.rect,255,0,0,255);
+	App->renderer->DrawQuad(test.rect,255,0,255,255);
+	App->renderer->DrawQuad(floor.rect, 255, 0, 0, 255);
 	
 
 	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
