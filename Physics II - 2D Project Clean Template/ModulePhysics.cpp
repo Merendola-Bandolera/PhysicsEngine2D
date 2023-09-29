@@ -3,7 +3,7 @@
 #include "ModulePhysics.h"
 #include "math.h"
 #include "ModuleRender.h"
-
+#include "ModuleInput.h"
 ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	debug = true;
@@ -23,8 +23,6 @@ bool ModulePhysics::Start()
 	test.w = 10;
 	test.h = 10;
 	test.gravity = -9.8f;
-	test.speed = 8;
-	test.force = 8;
 	test.rect = {test.x, test.y, test.w,test.h};
 	
 	floor.x = 0;
@@ -41,6 +39,22 @@ bool ModulePhysics::Start()
 update_status ModulePhysics::PreUpdate()
 {
 	
+	SDL_GetMouseState(&mousex, &mousey);
+
+	bector = GetVector(floor.x, floor.y, mousex, mousey);
+
+	if (App->input->GetKey(SDL_SCANCODE_SPACE)) 
+	{
+		test.force.x = mousex/10;
+		test.force.y = mousey/10;
+
+		test.x = floor.x;
+		test.y = floor.y;
+	}
+
+
+	
+
 	if (!test.Intersects(floor.rect))
 	test.Gravity();
 
@@ -56,6 +70,7 @@ update_status ModulePhysics::PostUpdate()
 	test.rect = { test.x, test.y, test.w,test.h };
 	App->renderer->DrawQuad(test.rect,255,0,255,255);
 	App->renderer->DrawQuad(floor.rect, 255, 0, 0, 255);
+	App->renderer->DrawLine(floor.x,floor.y,mousex,mousey,100,255,0,255);
 	
 
 	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)

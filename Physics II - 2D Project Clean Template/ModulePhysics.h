@@ -5,6 +5,35 @@
 class ModulePhysics : public Module
 {
 public:
+
+	struct Vector2D 
+	{
+		float x;
+		float y;
+	};
+
+	Vector2D GetVector(float ix, float iy, float fx, float fy)
+	{
+		Vector2D vectordir;
+
+		float squarert;
+
+		vectordir.x = fx - ix;
+		vectordir.y = fx - iy;
+
+		squarert = sqrt(vectordir.x * vectordir.x + vectordir.y * vectordir.y);
+		
+		vectordir.x = vectordir.x / squarert;
+		vectordir.y = vectordir.y / squarert;
+
+		return vectordir;
+	}
+
+	float GetAngle() 
+	{
+
+	}
+
 	ModulePhysics(Application* app, bool start_enabled = true);
 	~ModulePhysics();
 
@@ -24,7 +53,7 @@ public:
 		int mass;
 		int speed;
 		float acceleration;
-		float force;
+		Vector2D force;
 		SDL_Rect rect;
 	
 
@@ -32,15 +61,16 @@ public:
 		{
 		
 
-			x = x + speed + force;
+			x = x + force.x;
 			
-			if (force != 0)
-				force -= 0.1f;
+			/*if (force.x != 0)
+				force.x -= 0.1f;*/
 		}
 		
 		void Gravity() 
 		{
-			y = y - gravity;
+			force.y -= gravity;
+			y = y + force.y;
 		}
 
 		bool Intersects(const SDL_Rect& r) const
@@ -66,4 +96,7 @@ private:
 	bool debug;
 	square test;
 	square floor;
+	int mousex;
+	int mousey;
+	Vector2D bector;
 };
