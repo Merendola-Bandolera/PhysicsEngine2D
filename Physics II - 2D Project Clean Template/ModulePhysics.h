@@ -57,50 +57,22 @@ public:
 		int h;
 		int gravity;
 		int mass;
-		int speed;
+		float speed;
 		float acceleration;
+		float angle;
 		Vector2D force;
 		SDL_Rect rect;
-		float time = 1;
-		float fps;
-		Uint64 NOW = SDL_GetTicks();
-		Uint64 LAST = 0;
-		double deltaTime = 0;
-		float dummy;
+		float time;
+		
 
 		void xMovement() 
 		{
-			dummy = 8 * cos(45);
-
-			if (dummy < 0)
-				dummy *= -1;
-
-			x = x + dummy;
-			
-			
-			/*if (force.x != 0)
-				force.x -= 0.1f;*/
+			x += force.x * 0.016;
 		}
-		
-		double GetDelta() {
-			LAST = NOW;
-			NOW = SDL_GetTicks();
-			deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetTicks());
-
-			return deltaTime;
-		}
-
+	
 		void Gravity() 
 		{
-			time += 0.01f;
-				
-			fps = 8 *sin(45);
-			//y = 3*sin(atan2(3, 4)) + 1/2*gravity*time*time;
-			if (fps < 0)
-				fps *= -1;
-
-			y += -fps +  -gravity * time;
-			//y -= 10 + gravity * GetDelta();
+		
 		}
 
 		bool Intersects(const SDL_Rect& r) const
@@ -117,9 +89,6 @@ public:
 		
 	};
 
-	
-
-
 private:
 	SDL_Renderer* renderer;
 	SDL_Rect rect;
@@ -128,7 +97,6 @@ private:
 	square floor;
 	int mousex;
 	int mousey;
-	Vector2D bector;
 	bool isLaunched;
 
 	

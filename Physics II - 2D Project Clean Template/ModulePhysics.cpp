@@ -4,6 +4,7 @@
 #include "math.h"
 #include "ModuleRender.h"
 #include "ModuleInput.h"
+
 ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	debug = true;
@@ -22,7 +23,8 @@ bool ModulePhysics::Start()
 	test.y = 250;    
 	test.w = 10;
 	test.h = 10;
-	test.gravity = -9.8f;
+	test.speed = 15;
+	test.angle = 45;
 	test.rect = {test.x, test.y, test.w,test.h};
 	
 	floor.x = 0;
@@ -38,34 +40,29 @@ bool ModulePhysics::Start()
 // 
 update_status ModulePhysics::PreUpdate()
 {
-	
+	static char title;
+
 	SDL_GetMouseState(&mousex, &mousey);
 
-	bector = GetVector(floor.x, floor.y, mousex, mousey);
+	
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE)) 
 	{
-		test.x = 0;
-		test.y = 250;
-
-		test.force.x = mousex;
-		test.force.y = mousey;
-		test.time = 0;
+		test.time += 0.1f;
+		test.x += test.speed * cos(test.angle * 3.1416/180)* test.time;
+		test.y -= test.speed * sin(test.angle * 3.1416 / 180)*test.time;
+		test.y += (pow(test.time, 2) * 10 * 0.5f);
 		
-
-		isLaunched = true;
-	}
 
 
 	
+	}
+
+	
+	
 
 	/*if (!test.Intersects(floor.rect))*/
-	if (isLaunched == true && test.y < 300) 
-	{
-		test.Gravity();
-
-		test.xMovement();
-	}
+	
 		return UPDATE_CONTINUE;
 }
 
