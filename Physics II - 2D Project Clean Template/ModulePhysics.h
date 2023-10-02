@@ -1,6 +1,7 @@
 #pragma once
 #include "Module.h"
 #include "Globals.h"
+#include "Application.h"
 
 class ModulePhysics : public Module
 {
@@ -28,10 +29,15 @@ public:
 
 		return vectordir;
 	}
-
+	
+	
+	
+		
+		
+	
 	float GetAngle() 
 	{
-
+		
 	}
 
 	ModulePhysics(Application* app, bool start_enabled = true);
@@ -55,22 +61,46 @@ public:
 		float acceleration;
 		Vector2D force;
 		SDL_Rect rect;
-	
+		float time = 1;
+		float fps;
+		Uint64 NOW = SDL_GetTicks();
+		Uint64 LAST = 0;
+		double deltaTime = 0;
+		float dummy;
 
 		void xMovement() 
 		{
-		
+			dummy = 8 * cos(45);
 
-			x = x + force.x;
+			if (dummy < 0)
+				dummy *= -1;
+
+			x = x + dummy;
+			
 			
 			/*if (force.x != 0)
 				force.x -= 0.1f;*/
 		}
 		
+		double GetDelta() {
+			LAST = NOW;
+			NOW = SDL_GetTicks();
+			deltaTime = (double)((NOW - LAST) * 1000 / (double)SDL_GetTicks());
+
+			return deltaTime;
+		}
+
 		void Gravity() 
 		{
-			force.y -= gravity;
-			y = y + force.y;
+			time += 0.01f;
+				
+			fps = 8 *sin(45);
+			//y = 3*sin(atan2(3, 4)) + 1/2*gravity*time*time;
+			if (fps < 0)
+				fps *= -1;
+
+			y += -fps +  -gravity * time;
+			//y -= 10 + gravity * GetDelta();
 		}
 
 		bool Intersects(const SDL_Rect& r) const
@@ -99,4 +129,7 @@ private:
 	int mousex;
 	int mousey;
 	Vector2D bector;
+	bool isLaunched;
+
+	
 };

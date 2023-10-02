@@ -19,7 +19,7 @@ bool ModulePhysics::Start()
 	LOG("Creating Physics 2D environment");
 
 	test.x = 0;
-	test.y = 0;    
+	test.y = 250;    
 	test.w = 10;
 	test.h = 10;
 	test.gravity = -9.8f;
@@ -45,22 +45,28 @@ update_status ModulePhysics::PreUpdate()
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE)) 
 	{
-		test.force.x = mousex/10;
-		test.force.y = mousey/10;
+		test.x = 0;
+		test.y = 250;
 
-		test.x = floor.x;
-		test.y = floor.y;
+		test.force.x = mousex;
+		test.force.y = mousey;
+		test.time = 0;
+		
+
+		isLaunched = true;
 	}
 
 
 	
 
-	if (!test.Intersects(floor.rect))
-	test.Gravity();
+	/*if (!test.Intersects(floor.rect))*/
+	if (isLaunched == true && test.y < 300) 
+	{
+		test.Gravity();
 
-	test.xMovement();
-
-	return UPDATE_CONTINUE;
+		test.xMovement();
+	}
+		return UPDATE_CONTINUE;
 }
 
 // 
@@ -70,7 +76,7 @@ update_status ModulePhysics::PostUpdate()
 	test.rect = { test.x, test.y, test.w,test.h };
 	App->renderer->DrawQuad(test.rect,255,0,255,255);
 	App->renderer->DrawQuad(floor.rect, 255, 0, 0, 255);
-	App->renderer->DrawLine(floor.x,floor.y,mousex,mousey,100,255,0,255);
+	App->renderer->DrawLine(floor.x,250,mousex,mousey,100,255,0,255);
 	
 
 	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
