@@ -28,8 +28,8 @@ bool ModulePhysics::Start()
 	test.rect = {test.x, test.y, test.w,test.h};
 	
 	floor.x = 0;
-	floor.y = 300;
-	floor.w = 100;
+	floor.y = 260;
+	floor.w = 1000;
 	floor.h = 10;
 	floor.gravity = 0;
 	floor.rect = { floor.x, floor.y, floor.w,floor.h };
@@ -48,18 +48,36 @@ update_status ModulePhysics::PreUpdate()
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE)) 
 	{
-		test.time += 0.1f;
-		test.x += test.speed * cos(test.angle * 3.1416/180)* test.time;
-		test.y -= test.speed * sin(test.angle * 3.1416 / 180)*test.time;
-		test.y += (pow(test.time, 2) * 10 * 0.5f);
-		
-
-
+		test.time = 0;
+		test.x = 0;
+		test.y = 250;
+		isLaunched = true;
 	
 	}
 
+	if (isLaunched == true) 
+	{
+		test.time += 0.1f;
+		test.x += test.speed * cos(test.angle * 3.1415 / 180) * test.time;
+		test.y -= test.speed * sin(test.angle * 3.1415 / 180) * test.time;
+		test.y += (test.time * test.time * 10 * 0.5f);
+	}
 	
-	
+	if (test.y >= 250) {
+		isLaunched = false;
+		test.y = 250;
+	}
+		
+
+	if (App->input->GetKey(SDL_SCANCODE_A))
+	{
+		test.angle++;
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_D))
+	{
+		test.angle--;
+	}
 
 	/*if (!test.Intersects(floor.rect))*/
 	
