@@ -61,6 +61,7 @@ update_status ModulePhysics::PreUpdate()
 		test.x += test.speed * cos(test.angle * 3.1415 / 180) * test.time;
 		test.y -= test.speed * sin(test.angle * 3.1415 / 180) * test.time;
 		test.y += (test.time * test.time * 10 * 0.5f);
+		/*test.y += -20 + (test.speed * test.time) - (0.5f * - 9.8f * test.time * test.time);*/
 	}
 	
 	if (test.y >= 250) {
