@@ -68,6 +68,11 @@ bool Application::Init()
 	return ret;
 }
 
+void Application::PrepUpdate() 
+{
+	tim.Start();
+}
+
 // Call PreUpdate, Update and PostUpdate on all modules
 update_status Application::Update()
 {
@@ -75,6 +80,8 @@ update_status Application::Update()
 	
 	update_status ret = UPDATE_CONTINUE;
 	p2List_item<Module*>* item = list_modules.getFirst();
+
+	PrepUpdate();
 
 	while(item != NULL && ret == UPDATE_CONTINUE)
 	{
@@ -100,8 +107,14 @@ update_status Application::Update()
 			ret = item->data->PostUpdate();
 		item = item->next;
 	}
+	FinUpdate();
 
 	return ret;
+}
+
+void Application::FinUpdate() 
+{
+	tim.ReadSec();
 }
 
 bool Application::CleanUp()

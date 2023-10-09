@@ -12,6 +12,7 @@
 #include "ModulePlayer.h"
 #include "ModulePhysics.h"
 #include "ModuleSceneIntro.h"
+#include "Fps.h"
 
 class Application
 {
@@ -24,21 +25,25 @@ public:
 	ModulePlayer* player;
 	ModuleSceneIntro* scene_intro;
 	ModulePhysics* physics;
+	
 
 
 
 private:
 
 	p2List<Module*> list_modules;
-
+	Timer tim;
 public:
 
 	Application();
 	~Application();
 
+
 	bool Init();
 	update_status Update();
 	bool CleanUp();
+	void PrepUpdate();
+	void FinUpdate();
 
 private:
 

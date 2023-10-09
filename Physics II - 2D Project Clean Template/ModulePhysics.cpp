@@ -4,6 +4,7 @@
 #include "math.h"
 #include "ModuleRender.h"
 #include "ModuleInput.h"
+#include "Fps.h"
 
 ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -48,7 +49,7 @@ update_status ModulePhysics::PreUpdate()
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE)) 
 	{
-		test.time = 0;
+		
 		test.x = 0;
 		test.y = 250;
 		isLaunched = true;

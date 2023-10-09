@@ -7,6 +7,7 @@ class ModulePhysics : public Module
 {
 public:
 
+
 	struct Vector2D 
 	{
 		float x;
@@ -84,9 +85,9 @@ public:
 		}
 
 	private:
-
 	
 		
+	
 	};
 
 private:
