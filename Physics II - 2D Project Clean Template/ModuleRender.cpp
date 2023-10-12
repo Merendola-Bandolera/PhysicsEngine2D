@@ -59,7 +59,7 @@ update_status ModuleRender::Update()
 	SDL_RenderDrawRect(renderer, &rect);
 
 	int speed = 3;
-
+	/*
 	if(App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT)
 		App->renderer->camera.y += speed;
 
@@ -71,6 +71,7 @@ update_status ModuleRender::Update()
 
 	if(App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
 		App->renderer->camera.x -= speed;
+	*/
 	
 	return UPDATE_CONTINUE;
 }

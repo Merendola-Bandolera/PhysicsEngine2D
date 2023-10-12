@@ -70,7 +70,7 @@ update_status ModulePhysics::PreUpdate()
 		test.y = 250;
 	}
 		
-
+	
 	if (App->input->GetKey(SDL_SCANCODE_A))
 	{
 		test.angle++;
@@ -80,6 +80,7 @@ update_status ModulePhysics::PreUpdate()
 	{
 		test.angle--;
 	}
+	
 
 	/*if (!test.Intersects(floor.rect))*/
 	

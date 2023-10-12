@@ -23,6 +23,9 @@ public:
 	update_status Update();
 	bool CleanUp();
 
-public:
-
+private:
+	double x, y;
+	double xVelocity, yVelocity;
+	double xAcceleration, yAcceleration;
+	double mass;
 };
