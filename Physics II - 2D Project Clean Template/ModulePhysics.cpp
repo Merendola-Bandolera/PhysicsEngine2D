@@ -24,10 +24,16 @@ bool ModulePhysics::Start()
 	test.y = 250;    
 	test.w = 10;
 	test.h = 10;
-	test.speed = 15;
-	test.angle = 45;
+	test.speed = 100;
+	test.angle = -45;
 	test.rect = {test.x, test.y, test.w,test.h};
 	
+	test.vx = test.speed * cos(test.angle * 3.1415 / 180);
+	test.vy = test.speed * sin(test.angle * 3.1415 / 180);
+
+	test.ay = 10;
+	test.ax = 0;
+
 	floor.x = 0;
 	floor.y = 260;
 	floor.w = 1000;
@@ -49,9 +55,12 @@ update_status ModulePhysics::PreUpdate()
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE)) 
 	{
-		
+		test.vx = test.speed * cos(test.angle * 3.1415 / 180);
+		test.vy = test.speed * sin(test.angle * 3.1415 / 180);
 		test.x = 0;
 		test.y = 250;
+
+		test.time = 0;
 		isLaunched = true;
 	
 	}
@@ -59,10 +68,16 @@ update_status ModulePhysics::PreUpdate()
 	if (isLaunched == true) 
 	{
 		test.time += 0.1f;
-		test.x += test.speed * cos(test.angle * 3.1415 / 180) * test.time;
-		test.y -= test.speed * sin(test.angle * 3.1415 / 180) * test.time;
-		test.y += (test.time * test.time * 10 * 0.5f);
-		/*test.y += -20 + (test.speed * test.time) - (0.5f * - 9.8f * test.time * test.time);*/
+		test.vx += test.ax * test.time;
+		test.vy += test.ay * test.time;
+		
+		test.x += (test.vx / 2) * test.time;
+		test.y += (test.vy / 2) * test.time;
+
+		//test.x += test.speed * cos(test.angle * 3.1415 / 180) * test.time;
+		//test.y -= test.speed * sin(test.angle * 3.1415 / 180) * test.time;
+		//test.y += (test.time * test.time * 10 * 0.5f);
+		////test.y += -20 + (test.speed * test.time) - (0.5f * - 9.8f * test.time * test.time);
 	}
 	
 	if (test.y >= 250) {

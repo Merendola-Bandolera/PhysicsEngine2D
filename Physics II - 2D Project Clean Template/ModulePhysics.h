@@ -64,6 +64,7 @@ public:
 		Vector2D force;
 		SDL_Rect rect;
 		float time;
+		float vx, vy, ax, ay;
 		
 
 		void xMovement() 
