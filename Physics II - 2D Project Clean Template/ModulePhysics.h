@@ -100,6 +100,7 @@ private:
 	int mousex;
 	int mousey;
 	bool isLaunched;
-
+	float playerx;
+	float playery;
 	
 };

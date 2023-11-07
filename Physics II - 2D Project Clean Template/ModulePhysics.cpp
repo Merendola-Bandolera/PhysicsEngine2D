@@ -27,7 +27,7 @@ bool ModulePhysics::Start()
 	test.speed = 100;
 	test.angle = -45;
 	test.rect = {test.x, test.y, test.w,test.h};
-	
+	playery = 250;
 	test.vx = test.speed * cos(test.angle * 3.1415 / 180);
 	test.vy = test.speed * sin(test.angle * 3.1415 / 180);
 
@@ -51,13 +51,21 @@ update_status ModulePhysics::PreUpdate()
 
 	SDL_GetMouseState(&mousex, &mousey);
 
-	
+	if (App->input->GetKey(SDL_SCANCODE_LEFT) && isLaunched == false)
+	{
+		playerx--;
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_RIGHT) && isLaunched == false)
+	{
+		playerx++;
+	}
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE)) 
 	{
 		test.vx = test.speed * cos(test.angle * 3.1415 / 180);
 		test.vy = test.speed * sin(test.angle * 3.1415 / 180);
-		test.x = 0;
+		test.x = playerx;
 		test.y = 250;
 
 		test.time = 0;
@@ -105,9 +113,10 @@ update_status ModulePhysics::PreUpdate()
 // 
 update_status ModulePhysics::PostUpdate()
 {
-
+	SDL_Rect cannon = { playerx, playery, 25,25 };
 	test.rect = { test.x, test.y, test.w,test.h };
 	App->renderer->DrawQuad(test.rect,255,0,255,255);
+	App->renderer->DrawQuad(cannon, 255, 255, 255, 255);
 	App->renderer->DrawQuad(floor.rect, 255, 0, 0, 255);
 	App->renderer->DrawLine(floor.x,250,mousex,mousey,100,255,0,255);
 	
