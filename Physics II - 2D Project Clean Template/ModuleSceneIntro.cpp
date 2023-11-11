@@ -1,6 +1,8 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleSceneIntro.h"
+#include "Animation.h"
+#include "ModuleTextures.h"
 
 
 

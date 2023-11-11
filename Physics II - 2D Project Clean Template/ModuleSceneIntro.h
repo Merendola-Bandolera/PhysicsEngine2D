@@ -47,6 +47,7 @@ public:
 	SDL_Texture* tex_light_medium;
 	SDL_Texture* tex_light_big;
 	
+	
 	uint fx_light_tiny;
 	uint fx_light_medium;
 	uint fx_light_big;

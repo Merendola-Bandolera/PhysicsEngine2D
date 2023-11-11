@@ -5,6 +5,7 @@
 #include "ModuleRender.h"
 #include "ModuleInput.h"
 #include "Fps.h"
+#include "ModuleSceneIntro.h"
 
 ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -19,6 +20,25 @@ ModulePhysics::~ModulePhysics()
 bool ModulePhysics::Start()
 {
 	LOG("Creating Physics 2D environment");
+
+	//texture = App->textures->Load("Assets/Spritesheet");
+
+	//Explosion.pushback(0, 0, 85, 69);
+	//Explosion.pushback(84, 0, 85, 69);
+	//Explosion.pushback(169, 0, 85, 69);
+	//Explosion.pushback(254, 0, 85, 69);
+	//Explosion.pushback(339, 0, 85, 69);
+	//Explosion.pushback(424, 0, 85, 69);
+	//Explosion.pushback(509, 0, 85, 69);
+	//Explosion.pushback(594, 0, 85, 69);
+	//Explosion.pushback(679, 0, 85, 69);
+
+	//Ruedas.pushback(0, 201, 54, 54);
+	//Ruedas.pushback(53, 201, 54, 54);
+	//Ruedas.pushback(107, 201, 54, 54);
+	//Ruedas.pushback(162, 201, 54, 54);
+
+	//Canon(1, 138, 127, 36);
 
 	test.x = 0;
 	test.y = 250;

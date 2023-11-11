@@ -2,10 +2,15 @@
 #include "Module.h"
 #include "Globals.h"
 #include "Application.h"
-
+#include "Animation.h"
+#include "ModuleSceneIntro.h"
 class ModulePhysics : public Module
 {
 public:
+	SDL_Texture* texture;
+	Animation* Explosion;
+	Animation* Ruedas;
+	Animation* Canon;
 
 
 	struct Vector2D 
