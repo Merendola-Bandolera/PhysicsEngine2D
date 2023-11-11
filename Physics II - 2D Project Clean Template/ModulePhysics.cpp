@@ -19,7 +19,7 @@ ModulePhysics::~ModulePhysics()
 bool ModulePhysics::Start()
 {
 	LOG("Creating Physics 2D environment");
-
+	
 	test.x = 0;
 	test.y = 250;    
 	test.w = 10;
@@ -51,6 +51,24 @@ update_status ModulePhysics::PreUpdate()
 
 	SDL_GetMouseState(&mousex, &mousey);
 
+	switch (SDL_KEYDOWN){
+		case SDL_SCANCODE_1:
+			test.integrator = 1;
+			break;
+
+		case SDL_SCANCODE_2:
+			test.integrator = 2;
+			break;
+
+		case SDL_SCANCODE_3:
+			test.integrator = 3;
+			break;
+
+		case SDL_SCANCODE_4:
+			test.integrator = 4;
+			break;
+	}
+
 	if (App->input->GetKey(SDL_SCANCODE_LEFT) && isLaunched == false)
 	{
 		playerx--;
@@ -73,19 +91,28 @@ update_status ModulePhysics::PreUpdate()
 	
 	}
 
-	if (isLaunched == true) 
+	if (isLaunched == true && test.integrator == 1)
+	{
+		test.x += test.speed * cos(test.angle * 3.1415 / 180) * test.time;
+		test.y -= test.speed * sin(test.angle * 3.1415 / 180) * test.time;
+		test.y += (test.time * test.time * 10 * 0.5f);
+		test.y += -20 + (test.speed * test.time) - (0.5f * - 9.8f * test.time * test.time);
+	}
+	if (isLaunched == true && test.integrator == 2)
+	{
+		test.speed += (test.ax * sin(test.angle * 3.1415 / 180) + test.ay * cos(test.angle * 3.1415 / 180)) * test.time;
+		test.x += test.speed * cos(test.angle * 3.1415 / 180) * test.time;
+		test.y -= test.speed * sin(test.angle * 3.1415 / 180) * test.time;
+	}
+
+	if (isLaunched == true && test.integrator == 3)
 	{
 		test.time += 0.1f;
 		test.vx += test.ax * test.time;
 		test.vy += test.ay * test.time;
-		
+
 		test.x += (test.vx / 2) * test.time;
 		test.y += (test.vy / 2) * test.time;
-
-		//test.x += test.speed * cos(test.angle * 3.1415 / 180) * test.time;
-		//test.y -= test.speed * sin(test.angle * 3.1415 / 180) * test.time;
-		//test.y += (test.time * test.time * 10 * 0.5f);
-		////test.y += -20 + (test.speed * test.time) - (0.5f * - 9.8f * test.time * test.time);
 	}
 	
 	if (test.y >= 250) {

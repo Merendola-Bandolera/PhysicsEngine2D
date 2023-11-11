@@ -65,7 +65,10 @@ public:
 		SDL_Rect rect;
 		float time;
 		float vx, vy, ax, ay;
-		
+		bool impliciteuler = false;
+		bool symplecticeuler = false;
+		bool velocityverlet = false;
+		int integrator = 3;
 
 		void xMovement() 
 		{
