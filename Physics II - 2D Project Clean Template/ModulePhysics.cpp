@@ -25,7 +25,7 @@ bool ModulePhysics::Start()
 	test.w = 10;
 	test.h = 10;
 	
-	test.speed = 100;
+	test.speed = 1;
 	test.angle = -45;
 	test.rect = { test.x, test.y, test.w,test.h };
 	playery = 250;
@@ -34,6 +34,7 @@ bool ModulePhysics::Start()
 
 	test.ay = 10;
 	test.ax = 0;
+	test.acceleration = 2;
 
 	floor.x = 0;
 	floor.y = 260;
@@ -58,6 +59,16 @@ update_status ModulePhysics::PreUpdate()
 
 	SDL_GetMouseState(&mousex, &mousey);
 
+	if (App->input->GetKey(SDL_SCANCODE_G) == KEY_DOWN)
+	{
+		if (limitFps == true) {
+			limitFps = false;
+		}
+		else {
+			limitFps = true;
+		}
+	}
+
 	switch (SDL_KEYDOWN) {
 	case SDL_SCANCODE_1:
 		test.integrator = 1;
@@ -76,17 +87,32 @@ update_status ModulePhysics::PreUpdate()
 		break;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_LEFT) && isLaunched == false)
+	if (App->input->GetKey(SDL_SCANCODE_1)) {
+		test.integrator = 1;
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_2)) {
+		test.integrator = 2;
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_3)) {
+		test.integrator = 3;
+	}
+
+	
+
+
+	if (App->input->GetKey(SDL_SCANCODE_LEFT))
 	{
 		playerx--;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_RIGHT) && isLaunched == false)
+	if (App->input->GetKey(SDL_SCANCODE_RIGHT))
 	{
 		playerx++;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_SPACE) && isLaunched == false)
+	if (App->input->GetKey(SDL_SCANCODE_SPACE) )
 	{
 		playery--;
 	}
@@ -101,6 +127,7 @@ update_status ModulePhysics::PreUpdate()
 		test.vy = test.speed * sin(test.angle * 3.1415 / 180);
 		test.x = playerx;
 		test.y = playery;
+		test.speed = 70;
 
 		test.time = 0;
 		isLaunched = true;
@@ -109,16 +136,26 @@ update_status ModulePhysics::PreUpdate()
 	
 	if (isLaunched == true && test.integrator == 1)
 	{
-		test.x += test.speed * cos(test.angle * 3.1415 / 180) * test.time;
-		test.y -= test.speed * sin(test.angle * 3.1415 / 180) * test.time;
-		test.y += (test.time * test.time * 10 * 0.5f);
-		test.y += -20 + (test.speed * test.time) - (0.5f * -9.8f * test.time * test.time);
+		test.time += 0.02f;
+		
+		
+		test.x += test.vx/3 * test.time;
+		test.vx += test.ax * test.time;
+	
+		test.y += test.vy/3 * test.time;
+		test.vy += 5 * test.time * test.time;
+		integratorName = "Implicit Euler";
 	}
 	if (isLaunched == true && test.integrator == 2)
 	{
-		test.speed += (test.ax * sin(test.angle * 3.1415 / 180) + test.ay * cos(test.angle * 3.1415 / 180)) * test.time;
-		test.x += test.speed * cos(test.angle * 3.1415 / 180) * test.time;
-		test.y -= test.speed * sin(test.angle * 3.1415 / 180) * test.time;
+		test.time += 0.02f;
+		test.vx += test.ax * test.time;
+		test.x += test.vx / 3 * test.time;
+		
+		test.vy += 5 * test.time * test.time;
+		test.y += test.vy / 3 * test.time;
+	
+		integratorName = "Symplectic Euler";
 	}
 
 	if (isLaunched == true && test.integrator == 3)
@@ -127,8 +164,9 @@ update_status ModulePhysics::PreUpdate()
 		test.vx += test.ax * test.time;
 		test.vy += test.ay * test.time;
 
-		test.x += (test.vx / 2) * test.time;
-		test.y += (test.vy / 2) * test.time;
+		test.x += (test.vx) * test.time;
+		test.y += (test.vy) * test.time;
+		integratorName = "Velocity-Verlet";
 	}
 
 	if (test.y >= 250) {
@@ -166,26 +204,31 @@ update_status ModulePhysics::PostUpdate()
 	App->renderer->DrawQuad(floor.rect, 255, 0, 0, 255);
 	App->renderer->DrawLine(floor.x, 250, mousex, mousey, 100, 255, 0, 255);
 
-	tspeed = 100;
+	tspeed = test.speed;
 	tx = 0+playerx;
 	ty = playery;
 	tvx = tspeed * cos(test.angle * 3.1415 / 180);
 	tvy = tspeed * sin(test.angle * 3.1415 / 180);
 	
 	for (float i = 0; i <= 2; i+= 0.1f) {
-	
-	
+		
 		tvx += tax * i;
 		tvy += tay * i;			
 								
-		tx += (tvx / 2) * i;	
-		ty += (tvy / 2) * i;
+		tx += (tvx ) * i;	
+		ty += (tvy ) * i;
 		SDL_Rect dir = { tx, ty ,10,10 };
 		App->renderer->DrawQuad(dir, 10, 100, 255, 255, 100);
 	}
 	App->renderer->DrawQuad(test.rect, 255, 0, 255, 255);
+	char buffer[200];
+	sprintf_s(buffer, "Integrator: %s ",integratorName); // Format the string
+
+	char* myCharPointer = _strdup(buffer); // Allocate memory and copy the string
+
 	
 
+	App->window->SetTitle(myCharPointer);
 	if (App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
 		debug = !debug;
 

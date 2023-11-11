@@ -25,6 +25,7 @@ int main(int argc, char ** argv)
 
 	while (state != MAIN_EXIT)
 	{
+		int start = SDL_GetTicks();
 		switch (state)
 		{
 		case MAIN_CREATION:
@@ -54,6 +55,10 @@ int main(int argc, char ** argv)
 		{
 			int update_return = App->Update();
 
+			if (App->physics->limitFps == true && ((SDL_GetTicks() - start) < (1000 / 60)))
+			{
+				SDL_Delay((1000 /60) - (SDL_GetTicks() - start));
+			}
 			if (update_return == UPDATE_ERROR)
 			{
 				LOG("Application Update exits with ERROR");

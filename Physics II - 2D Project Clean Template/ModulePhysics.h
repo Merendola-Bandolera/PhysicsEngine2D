@@ -94,6 +94,8 @@ public:
 	
 	};
 
+public:
+	bool limitFps;
 private:
 	SDL_Renderer* renderer;
 	SDL_Rect rect;
@@ -115,4 +117,6 @@ private:
 	float tax;
 	float tay;
 	
+	char* integratorName;
+
 };
