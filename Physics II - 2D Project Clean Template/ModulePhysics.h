@@ -105,5 +105,14 @@ private:
 	bool isLaunched;
 	float playerx;
 	float playery;
+
+	float tx;
+	float ty;
+	float ttime;
+	float tvx;
+	float tvy;
+	float tspeed;
+	float tax;
+	float tay;
 	
 };
