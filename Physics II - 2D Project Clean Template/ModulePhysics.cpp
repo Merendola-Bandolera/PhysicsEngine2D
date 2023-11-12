@@ -21,36 +21,38 @@ bool ModulePhysics::Start()
 {
 	LOG("Creating Physics 2D environment");
 
-	texture = App->textures->Load("Assets/Spritesheet");
+	texture = App->textures->Load("../Assets/Spritesheet.png");
+	texture2 = App->textures->Load("../Assets/fondo.png");
+	texture3 = App->textures->Load("../Assets/bomba.png");
 
-	Explosion.Pushback(0, 0, 85, 69);
-	Explosion.Pushback(84, 0, 85, 69);
-	Explosion.Pushback(169, 0, 85, 69);
-	Explosion.Pushback(254, 0, 85, 69);
-	Explosion.Pushback(339, 0, 85, 69);
-	Explosion.Pushback(424, 0, 85, 69);
-	Explosion.Pushback(509, 0, 85, 69);
-	Explosion.Pushback(594, 0, 85, 69);
-	Explosion.Pushback(679, 0, 85, 69);
+	Explosion.PushBack({0, 0, 85, 69});
+	Explosion.PushBack({84, 0, 85, 69});
+	Explosion.PushBack({169, 0, 85, 69});
+	Explosion.PushBack({254, 0, 85, 69});
+	Explosion.PushBack({339, 0, 85, 69});
+	Explosion.PushBack({424, 0, 85, 69});
+	Explosion.PushBack({509, 0, 85, 69});
+	Explosion.PushBack({594, 0, 85, 69});
+	Explosion.PushBack({ 679, 0, 85, 69 });
 
-	Canon.
+	
 
-	Ruedas.pushback(0, 201, 54, 54);
-	Ruedas.pushback(53, 201, 54, 54);
-	Ruedas.pushback(107, 201, 54, 54);
-	Ruedas.pushback(162, 201, 54, 54);
+	Ruedas.PushBack({0, 201, 54, 54});
+	Ruedas.PushBack({53, 201, 54, 54});
+	Ruedas.PushBack({107, 201, 54, 54});
+	Ruedas.PushBack({ 162, 201, 54, 54 });
 
-	Canon(1, 138, 127, 36);
+	Canon.PushBack({ 1, 138, 127, 36 });
 
 	test.x = 0;
-	test.y = 250;
+	test.y = 588;
 	test.w = 10;
 	test.h = 10;
 	
 	test.speed = 1;
 	test.angle = -45;
 	test.rect = { test.x, test.y, test.w,test.h };
-	playery = 250;
+	playery = 588;
 	test.vx = test.speed * cos(test.angle * 3.1415 / 180);
 	test.vy = test.speed * sin(test.angle * 3.1415 / 180);
 
@@ -59,14 +61,14 @@ bool ModulePhysics::Start()
 	test.acceleration = 2;
 
 	floor.x = 0;
-	floor.y = 260;
+	floor.y = 588;
 	floor.w = 1000;
 	floor.h = 10;
 	floor.gravity = 0;
 	floor.rect = { floor.x, floor.y, floor.w,floor.h };
 
 	tx = 0;
-	ty = 250;
+	ty = 588;
 	tspeed = 100;
 	tay = 10;
 	tax = 0;
@@ -91,23 +93,6 @@ update_status ModulePhysics::PreUpdate()
 		}
 	}
 
-	switch (SDL_KEYDOWN) {
-	case SDL_SCANCODE_1:
-		test.integrator = 1;
-		break;
-
-	case SDL_SCANCODE_2:
-		test.integrator = 2;
-		break;
-
-	case SDL_SCANCODE_3:
-		test.integrator = 3;
-		break;
-
-	case SDL_SCANCODE_4:
-		test.integrator = 4;
-		break;
-	}
 
 	if (App->input->GetKey(SDL_SCANCODE_1)) {
 		test.integrator = 1;
@@ -138,7 +123,7 @@ update_status ModulePhysics::PreUpdate()
 	{
 		playery--;
 	}
-	else if (playery < 250) 
+	else if (playery < 588)
 	{
 		playery++;
 	}
@@ -147,8 +132,8 @@ update_status ModulePhysics::PreUpdate()
 	{
 		test.vx = test.speed * cos(test.angle * 3.1415 / 180);
 		test.vy = test.speed * sin(test.angle * 3.1415 / 180);
-		test.x = playerx;
-		test.y = playery;
+		test.x = playerx+120;
+		test.y = playery-70;
 		test.speed = 70;
 
 		test.time = 0;
@@ -191,18 +176,18 @@ update_status ModulePhysics::PreUpdate()
 		integratorName = "Velocity-Verlet";
 	}
 
-	if (test.y >= 250) {
+	if (test.y >= 588) {
 		isLaunched = false;
-		test.y = 250;
+		test.y = 588;
 	}
 
 
-	if (App->input->GetKey(SDL_SCANCODE_A))
+	if (App->input->GetKey(SDL_SCANCODE_D))
 	{
 		test.angle++;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_D))
+	if (App->input->GetKey(SDL_SCANCODE_A))
 	{
 		test.angle--;
 	}
@@ -219,18 +204,23 @@ update_status ModulePhysics::PreUpdate()
 update_status ModulePhysics::PostUpdate()
 {
 	
-	SDL_Rect cannon = { playerx, playery, 25,25 };
+	SDL_Rect cannon = { 1, 138, 127, 36 };
+	SDL_Rect rueda = { 0, 201, 54, 54 };
 	test.rect = { test.x, test.y, test.w,test.h };
-	
-	App->renderer->DrawQuad(cannon, 255, 255, 255, 255);
-	App->renderer->DrawQuad(floor.rect, 255, 0, 0, 255);
-	App->renderer->DrawLine(floor.x, 250, mousex, mousey, 100, 255, 0, 255);
+	App->renderer->Blit(texture2, 0, 0);
+	//App->renderer->DrawQuad(cannon, 255, 255, 255, 255);
+	App->renderer->Blit(texture, playerx, playery -75,&cannon);
+	App->renderer->Blit(texture, playerx, playery - 50, &rueda);
+	//App->renderer->DrawQuad(floor.rect, 255, 0, 0, 255);
+	//App->renderer->DrawLine(floor.x, 588, mousex, mousey, 100, 255, 0, 255);
 
 	tspeed = test.speed;
-	tx = 0+playerx;
-	ty = playery;
+	tx = 0+playerx +120;
+	ty = playery -70;
 	tvx = tspeed * cos(test.angle * 3.1415 / 180);
 	tvy = tspeed * sin(test.angle * 3.1415 / 180);
+
+	
 	
 	for (float i = 0; i <= 2; i+= 0.1f) {
 		
@@ -242,7 +232,10 @@ update_status ModulePhysics::PostUpdate()
 		SDL_Rect dir = { tx, ty ,10,10 };
 		App->renderer->DrawQuad(dir, 10, 100, 255, 255, 100);
 	}
-	App->renderer->DrawQuad(test.rect, 255, 0, 255, 255);
+
+
+	//App->renderer->DrawQuad(test.rect, 255, 0, 255, 255);
+	App->renderer->Blit(texture3, test.x-70, test.y-90);
 	char buffer[200];
 	sprintf_s(buffer, "Integrator: %s ",integratorName); // Format the string
 

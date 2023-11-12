@@ -53,14 +53,14 @@
     <ClInclude Include="p2List.h">
       <Filter>Header Files\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="ModulePhysics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Fps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Defs.h">
       <Filter>Header Files\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="ModulePhysics.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

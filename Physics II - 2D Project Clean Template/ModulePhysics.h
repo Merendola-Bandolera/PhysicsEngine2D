@@ -119,6 +119,8 @@ private:
 	float tax;
 	float tay;
 	SDL_Texture* texture;
+	SDL_Texture* texture2;
+	SDL_Texture* texture3;
 	Animation Explosion;
 	Animation Ruedas;
 	Animation Canon;
