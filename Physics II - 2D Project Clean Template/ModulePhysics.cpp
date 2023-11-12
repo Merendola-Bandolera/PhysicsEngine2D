@@ -21,24 +21,26 @@ bool ModulePhysics::Start()
 {
 	LOG("Creating Physics 2D environment");
 
-	//texture = App->textures->Load("Assets/Spritesheet");
+	texture = App->textures->Load("Assets/Spritesheet");
 
-	//Explosion.pushback(0, 0, 85, 69);
-	//Explosion.pushback(84, 0, 85, 69);
-	//Explosion.pushback(169, 0, 85, 69);
-	//Explosion.pushback(254, 0, 85, 69);
-	//Explosion.pushback(339, 0, 85, 69);
-	//Explosion.pushback(424, 0, 85, 69);
-	//Explosion.pushback(509, 0, 85, 69);
-	//Explosion.pushback(594, 0, 85, 69);
-	//Explosion.pushback(679, 0, 85, 69);
+	Explosion.Pushback(0, 0, 85, 69);
+	Explosion.Pushback(84, 0, 85, 69);
+	Explosion.Pushback(169, 0, 85, 69);
+	Explosion.Pushback(254, 0, 85, 69);
+	Explosion.Pushback(339, 0, 85, 69);
+	Explosion.Pushback(424, 0, 85, 69);
+	Explosion.Pushback(509, 0, 85, 69);
+	Explosion.Pushback(594, 0, 85, 69);
+	Explosion.Pushback(679, 0, 85, 69);
 
-	//Ruedas.pushback(0, 201, 54, 54);
-	//Ruedas.pushback(53, 201, 54, 54);
-	//Ruedas.pushback(107, 201, 54, 54);
-	//Ruedas.pushback(162, 201, 54, 54);
+	Canon.
 
-	//Canon(1, 138, 127, 36);
+	Ruedas.pushback(0, 201, 54, 54);
+	Ruedas.pushback(53, 201, 54, 54);
+	Ruedas.pushback(107, 201, 54, 54);
+	Ruedas.pushback(162, 201, 54, 54);
+
+	Canon(1, 138, 127, 36);
 
 	test.x = 0;
 	test.y = 250;

@@ -7,10 +7,7 @@
 class ModulePhysics : public Module
 {
 public:
-	SDL_Texture* texture;
-	Animation* Explosion;
-	Animation* Ruedas;
-	Animation* Canon;
+
 
 
 	struct Vector2D 
@@ -121,6 +118,10 @@ private:
 	float tspeed;
 	float tax;
 	float tay;
+	SDL_Texture* texture;
+	Animation Explosion;
+	Animation Ruedas;
+	Animation Canon;
 	
 	char* integratorName;
 
