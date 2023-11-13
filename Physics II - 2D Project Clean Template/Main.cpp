@@ -55,9 +55,9 @@ int main(int argc, char ** argv)
 		{
 			int update_return = App->Update();
 
-			if (App->physics->limitFps == true && ((SDL_GetTicks() - start) < (1000 / 60)))
+			if (App->physics->limitFps == true && ((SDL_GetTicks() - start) < (1000 / 10)))
 			{
-				SDL_Delay((1000 /60) - (SDL_GetTicks() - start));
+				SDL_Delay((1000 /10) - (SDL_GetTicks() - start));
 			}
 			if (update_return == UPDATE_ERROR)
 			{

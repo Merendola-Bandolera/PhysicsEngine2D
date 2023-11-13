@@ -60,10 +60,10 @@ bool ModulePhysics::Start()
 	test.ax = 0;
 	test.acceleration = 2;
 
-	floor.x = 0;
+	floor.x = 150;
 	floor.y = 588;
-	floor.w = 1000;
-	floor.h = 10;
+	floor.w = 100;
+	floor.h = 1000;
 	floor.gravity = 0;
 	floor.rect = { floor.x, floor.y, floor.w,floor.h };
 
@@ -149,8 +149,8 @@ update_status ModulePhysics::PreUpdate()
 		test.x += test.vx/3 * test.time;
 		test.vx += test.ax * test.time;
 	
-		test.y += test.vy/3 * test.time;
-		test.vy += 5 * test.time * test.time;
+		//test.y += test.vy/3 * test.time;
+		//test.vy += 5 * test.time * test.time;
 		integratorName = "Implicit Euler";
 	}
 	if (isLaunched == true && test.integrator == 2)
@@ -159,25 +159,27 @@ update_status ModulePhysics::PreUpdate()
 		test.vx += test.ax * test.time;
 		test.x += test.vx / 3 * test.time;
 		
-		test.vy += 5 * test.time * test.time;
-		test.y += test.vy / 3 * test.time;
+		//test.vy += 5 * test.time * test.time;
+		//test.y += test.vy / 3 * test.time;
 	
 		integratorName = "Symplectic Euler";
 	}
+	
 
 	if (isLaunched == true && test.integrator == 3)
 	{
 		test.time += 0.02f;
 		test.vx += test.ax * test.time;
-		test.vy += test.ay * test.time;
+		//test.vy += test.ay * test.time;
 
 		test.x += (test.vx) * test.time;
-		test.y += (test.vy) * test.time;
+		//test.y += (test.vy) * test.time;
 		integratorName = "Velocity-Verlet";
 	}
 
-	if (test.y >= 588) {
+	if (test.y >= 588 && isSwamp == false) {
 		isLaunched = false;
+		test.vy = 0;
 		test.y = 588;
 	}
 
@@ -190,6 +192,43 @@ update_status ModulePhysics::PreUpdate()
 	if (App->input->GetKey(SDL_SCANCODE_A))
 	{
 		test.angle--;
+	}
+
+	if (test.vy <0.1f && test.vy > -0.1f) {
+		yMax = test.y;
+	}
+
+	if (test.x > 150 && test.x < 250 && test.y >= 587) {
+		isSwamp = true;
+		
+		test.buoyancy += (3.0f * 9.8f * 1.75f);
+
+		test.vy += -test.buoyancy;
+		
+		if (test.vy < 0) {
+		test.vy -= 0.1f *test.vy;
+	}
+	else if (test.vy >= 0) {
+		test.vy += 0.1f*test.vy;
+	}
+
+		test.y += test.vy;
+	
+
+				
+	}
+	else {
+		isSwamp = false;
+		test.buoyancy = 0; 
+		if (test.vy < 0) {
+			test.vy -= 0.1f * test.vy;
+		}
+		else if (test.vy >= 0) {
+			test.vy += 0.1f * test.vy;
+		}
+		test.vy += test.ay * test.time;
+		test.y += (test.vy) * test.time;
+		
 	}
 
 	
@@ -211,7 +250,7 @@ update_status ModulePhysics::PostUpdate()
 	//App->renderer->DrawQuad(cannon, 255, 255, 255, 255);
 	App->renderer->Blit(texture, playerx, playery -75,&cannon);
 	App->renderer->Blit(texture, playerx, playery - 50, &rueda);
-	//App->renderer->DrawQuad(floor.rect, 255, 0, 0, 255);
+	App->renderer->DrawQuad(floor.rect, 0, 0, 255, 255);
 	//App->renderer->DrawLine(floor.x, 588, mousex, mousey, 100, 255, 0, 255);
 
 	tspeed = test.speed;

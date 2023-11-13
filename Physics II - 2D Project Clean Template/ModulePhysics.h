@@ -58,8 +58,10 @@ public:
 		int y;
 		int w;
 		int h;
+		
 		int gravity;
 		int mass;
+		float buoyancy;
 		float speed;
 		float acceleration;
 		float angle;
@@ -124,7 +126,9 @@ private:
 	Animation Explosion;
 	Animation Ruedas;
 	Animation Canon;
-	
+	Animation* CurrentAnim;
+	bool isSwamp;
 	char* integratorName;
+	float yMax;
 
 };
