@@ -59,6 +59,8 @@ bool ModulePhysics::Start()
 	test.ay = 10;
 	test.ax = 0;
 	test.acceleration = 2;
+	test.mass = 7.5f;
+	test.roce = 0;
 
 	floor.x = 150;
 	floor.y = 588;
@@ -170,20 +172,21 @@ update_status ModulePhysics::PreUpdate()
 	{
 		test.time += 0.02f;
 		test.vx += test.ax * test.time;
-		//test.vy += test.ay * test.time;
+		test.vy += test.ay * test.time;
 
 		test.x += (test.vx) * test.time;
-		//test.y += (test.vy) * test.time;
+		test.y += (test.vy) * test.time;
 		integratorName = "Velocity-Verlet";
 	}
 
 	if (test.y >= 588 && isSwamp == false) {
 		isLaunched = false;
+		//test.time = 0;
 		test.vy = 0;
 		test.y = 588;
 	}
 
-
+	//CONTROLES
 	if (App->input->GetKey(SDL_SCANCODE_D))
 	{
 		test.angle++;
@@ -198,34 +201,49 @@ update_status ModulePhysics::PreUpdate()
 		yMax = test.y;
 	}
 
+	//LAGO
 	if (test.x > 150 && test.x < 250 && test.y >= 587) {
 		isSwamp = true;
 		
-		test.buoyancy += (3.0f * 9.8f * 1.75f);
+		//FUERZA BOYANCI
+		test.buoyancy += (1.0f * 9.8f * 1.75f) ;
 
-		test.vy += -test.buoyancy;
+		//FUERZA GRAVEDAD
+		test.gravity += test.mass * 9.8f ;
+
+	/*	test.vy += -test.buoyancy;*/
 		
+		//ROZAMIENTO
 		if (test.vy < 0) {
-		test.vy -= 0.1f *test.vy;
-	}
-	else if (test.vy >= 0) {
-		test.vy += 0.1f*test.vy;
-	}
+		test.roce += 10 *test.vy ;
+		}
+		else if (test.vy >= 0) {
+		test.roce -= 10*test.vy;
+		}
+
+		test.force.y += test.gravity - test.buoyancy + test.roce;
+
+		test.vy += (test.force.y / test.mass) * (test.time);
 
 		test.y += test.vy;
 	
-
+		//FUERZA TOTAL = FG + BOUYANCY -ROCE
+		//VELOCIDAD = (Ft/MASA)*TIEMPO
 				
 	}
 	else {
 		isSwamp = false;
+		
 		test.buoyancy = 0; 
+		//ROZAMIENTO
 		if (test.vy < 0) {
-			test.vy -= 0.1f * test.vy;
+			test.roce -= 0.1f * test.vy;
 		}
 		else if (test.vy >= 0) {
-			test.vy += 0.1f * test.vy;
+			test.roce += 0.1f * test.vy;
 		}
+
+
 		test.vy += test.ay * test.time;
 		test.y += (test.vy) * test.time;
 		

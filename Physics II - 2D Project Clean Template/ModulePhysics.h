@@ -62,6 +62,7 @@ public:
 		int gravity;
 		int mass;
 		float buoyancy;
+		float roce;
 		float speed;
 		float acceleration;
 		float angle;
