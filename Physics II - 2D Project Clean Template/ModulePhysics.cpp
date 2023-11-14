@@ -66,7 +66,7 @@ bool ModulePhysics::Start()
 	floor.y = 588;
 	floor.w = 100;
 	floor.h = 1000;
-	floor.gravity = 0;
+	
 	floor.rect = { floor.x, floor.y, floor.w,floor.h };
 
 	tx = 0;
@@ -143,45 +143,27 @@ update_status ModulePhysics::PreUpdate()
 
 	}
 	
+	//INTEGRATOR 1
 	if (isLaunched == true && test.integrator == 1)
-	{
-		test.time += 0.02f;
-		
-		
-		test.x += test.vx/3 * test.time;
-		test.vx += test.ax * test.time;
+	{		
 	
-		//test.y += test.vy/3 * test.time;
-		//test.vy += 5 * test.time * test.time;
-		integratorName = "Implicit Euler";
 	}
+	//INTEGRATOR 2
 	if (isLaunched == true && test.integrator == 2)
 	{
-		test.time += 0.02f;
-		test.vx += test.ax * test.time;
-		test.x += test.vx / 3 * test.time;
 		
-		//test.vy += 5 * test.time * test.time;
-		//test.y += test.vy / 3 * test.time;
 	
-		integratorName = "Symplectic Euler";
 	}
 	
-
+	//INTEGRATOR 3
 	if (isLaunched == true && test.integrator == 3)
 	{
-		test.time += 0.02f;
-		test.vx += test.ax * test.time;
-		test.vy += test.ay * test.time;
-
-		test.x += (test.vx) * test.time;
-		test.y += (test.vy) * test.time;
-		integratorName = "Velocity-Verlet";
+		
+		
 	}
 
 	if (test.y >= 588 && isSwamp == false) {
 		isLaunched = false;
-		//test.time = 0;
 		test.vy = 0;
 		test.y = 588;
 	}
@@ -201,15 +183,15 @@ update_status ModulePhysics::PreUpdate()
 		yMax = test.y;
 	}
 
-	//LAGO
+	//HYDRODINAMICS
 	if (test.x > 150 && test.x < 250 && test.y >= 587) {
 		isSwamp = true;
 		
 		//FUERZA BOYANCI
-		test.buoyancy += (1.0f * 9.8f * 1.75f) ;
+		test.buoyancy += (0.3f * 9.8f * 1.75f) ;
 
 		//FUERZA GRAVEDAD
-		test.gravity += test.mass * 9.8f ;
+		//test.gravity += test.mass * 9.8f ;
 
 	/*	test.vy += -test.buoyancy;*/
 		
@@ -221,14 +203,15 @@ update_status ModulePhysics::PreUpdate()
 		test.roce -= 10*test.vy;
 		}
 
-		test.force.y += test.gravity - test.buoyancy + test.roce;
-
-		test.vy += (test.force.y / test.mass) * (test.time);
-
-		test.y += test.vy;
-	
 		//FUERZA TOTAL = FG + BOUYANCY -ROCE
+		//(test.force.y += test.gravity - test.buoyancy + test.roce;
+
 		//VELOCIDAD = (Ft/MASA)*TIEMPO
+		//test.vy -= (test.force.y / test.mass) * (test.time);
+
+		isLaunched = true;
+	
+		
 				
 	}
 	else {
@@ -257,6 +240,80 @@ update_status ModulePhysics::PreUpdate()
 	return UPDATE_CONTINUE;
 }
 
+void ModulePhysics::ForceSum(square obj, float gforce, float hydrodinamics, float aerodynamics, float launchforcex, float launchforcey)
+{
+	
+	obj.TotalForce.x = 0;
+	obj.TotalForce.y = 0;
+
+	gforce = obj.mass * 9.8f ; //masa * gravedad
+
+	if (isSwamp == true) {
+		obj.roce = obj.vy* 0.1f; //drag del awa
+
+		hydrodinamics = (0.3f * 9.8f * 1.75f) - obj.roce; // Densidad agua * Gravedad * Volumen
+		
+	}
+	
+
+	if (isSwamp == false)
+	{
+		hydrodinamics = 0;
+		aerodynamics = 1 / 2 * obj.density * obj.vy * obj.vy *obj.surface * obj.CDrag; //0.5 * densidad * v*v * Surface * coeficiente 
+	}
+
+	launchforcex = 50;
+	launchforcey = 50;
+
+	obj.TotalForce.x = launchforcex;
+	obj.TotalForce.y = gforce - hydrodinamics - aerodynamics - launchforcey;
+
+}
+
+void ModulePhysics::VelocityVerlet(square obj) {
+
+	obj.ax = obj.TotalForce.x / obj.mass;
+
+	obj.ay = obj.TotalForce.y / obj.mass;
+
+
+	obj.vx += obj.ax * obj.time;
+	obj.vy += obj.ay * obj.time;
+
+	obj.x += (obj.vx) * obj.time;
+	obj.y += (obj.vy) * obj.time;
+	integratorName = "Velocity-Verlet";
+}
+void ModulePhysics::VelocityVerlet(square obj) {
+
+	obj.ax = obj.TotalForce.x / obj.mass;
+
+	obj.ay = obj.TotalForce.y / obj.mass;
+
+
+
+	obj.x += obj.vx / 3 * obj.time;
+	obj.vx += obj.ax * obj.time;
+
+	obj.y += test.vy/3 * obj.time;
+	obj.vy += 5 * obj.time * obj.time;
+	integratorName = "Implicit Euler";
+}
+void ModulePhysics::VelocityVerlet(square obj) {
+
+	obj.ax = obj.TotalForce.x / obj.mass;
+
+	obj.ay = obj.TotalForce.y / obj.mass;
+
+
+	obj.vx += obj.ax * obj.time;
+	obj.x += obj.vx / 3 * obj.time;
+
+	obj.vy += obj.ay * obj.time * obj.time;
+	obj.y += obj.vy / 3 * obj.time;
+
+	integratorName = "Symplectic Euler";
+}
 // 
 update_status ModulePhysics::PostUpdate()
 {

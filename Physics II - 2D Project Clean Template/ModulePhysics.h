@@ -3,6 +3,7 @@
 #include "Globals.h"
 #include "Application.h"
 #include "Animation.h"
+
 #include "ModuleSceneIntro.h"
 class ModulePhysics : public Module
 {
@@ -49,6 +50,7 @@ public:
 	bool Start();
 	update_status PreUpdate();
 	update_status PostUpdate();
+	
 	bool CleanUp();
 
 	class square
@@ -58,15 +60,19 @@ public:
 		int y;
 		int w;
 		int h;
-		
-		int gravity;
 		int mass;
+		int density;
+		int surface;
+		int CDrag;
+
 		float buoyancy;
 		float roce;
 		float speed;
 		float acceleration;
 		float angle;
-		Vector2D force;
+		Vector2D TotalForce;
+
+
 		SDL_Rect rect;
 		float time;
 		float vx, vy, ax, ay;
@@ -75,15 +81,9 @@ public:
 		bool velocityverlet = false;
 		int integrator = 3;
 
-		void xMovement() 
-		{
-			x += force.x * 0.016;
-		}
+
+
 	
-		void Gravity() 
-		{
-		
-		}
 
 		bool Intersects(const SDL_Rect& r) const
 		{
@@ -98,7 +98,8 @@ public:
 		
 	
 	};
-
+	void ForceSum(square patata, float gravity, float hydrodinamics, float aerodynamics, float launchforcex, float launchforcey);
+	void VelocityVerlet(square obj);
 public:
 	bool limitFps;
 private:
@@ -131,5 +132,8 @@ private:
 	bool isSwamp;
 	char* integratorName;
 	float yMax;
+	float dt;
+
+
 
 };
