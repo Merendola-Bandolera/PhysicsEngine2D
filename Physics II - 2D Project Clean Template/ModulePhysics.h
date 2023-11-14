@@ -98,8 +98,10 @@ public:
 		
 	
 	};
-	void ForceSum(square patata, float gravity, float hydrodinamics, float aerodynamics, float launchforcex, float launchforcey);
+	void ForceSum(square patata,  float launchforcex, float launchforcey);
 	void VelocityVerlet(square obj);
+	void SymplecticEuler(square obj);
+	void ImplicitEuler(square obj);
 public:
 	bool limitFps;
 private:
@@ -133,7 +135,7 @@ private:
 	char* integratorName;
 	float yMax;
 	float dt;
-
+	square obj;
 
 
 };

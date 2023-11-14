@@ -75,6 +75,8 @@ bool ModulePhysics::Start()
 	tay = 10;
 	tax = 0;
 
+	
+
 	return true;
 }
 
@@ -146,20 +148,17 @@ update_status ModulePhysics::PreUpdate()
 	//INTEGRATOR 1
 	if (isLaunched == true && test.integrator == 1)
 	{		
-	
+		SymplecticEuler(obj);
 	}
 	//INTEGRATOR 2
 	if (isLaunched == true && test.integrator == 2)
 	{
-		
-	
-	}
-	
+		ImplicitEuler(obj);	
+	}	
 	//INTEGRATOR 3
 	if (isLaunched == true && test.integrator == 3)
 	{
-		
-		
+		VelocityVerlet(obj);		
 	}
 
 	if (test.y >= 588 && isSwamp == false) {
@@ -240,9 +239,12 @@ update_status ModulePhysics::PreUpdate()
 	return UPDATE_CONTINUE;
 }
 
-void ModulePhysics::ForceSum(square obj, float gforce, float hydrodinamics, float aerodynamics, float launchforcex, float launchforcey)
+void ModulePhysics::ForceSum(square obj, float launchforcex, float launchforcey)
 {
-	
+	float gforce;
+	float hydrodinamics;
+	float aerodynamics;
+
 	obj.TotalForce.x = 0;
 	obj.TotalForce.y = 0;
 
@@ -284,7 +286,7 @@ void ModulePhysics::VelocityVerlet(square obj) {
 	obj.y += (obj.vy) * obj.time;
 	integratorName = "Velocity-Verlet";
 }
-void ModulePhysics::VelocityVerlet(square obj) {
+void ModulePhysics::ImplicitEuler(square obj) {
 
 	obj.ax = obj.TotalForce.x / obj.mass;
 
@@ -299,7 +301,7 @@ void ModulePhysics::VelocityVerlet(square obj) {
 	obj.vy += 5 * obj.time * obj.time;
 	integratorName = "Implicit Euler";
 }
-void ModulePhysics::VelocityVerlet(square obj) {
+void ModulePhysics::SymplecticEuler(square obj) {
 
 	obj.ax = obj.TotalForce.x / obj.mass;
 
