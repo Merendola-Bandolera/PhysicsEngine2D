@@ -273,10 +273,11 @@ void ModulePhysics::ForceSum(square obj, float launchforcex, float launchforcey)
 }
 
 void ModulePhysics::VelocityVerlet(square obj) {
+	obj.time += 0.2;
 
-	obj.ax = obj.TotalForce.x / obj.mass;
+	obj.ax = obj.TotalForce.x / obj.mass * obj.time;
 
-	obj.ay = obj.TotalForce.y / obj.mass;
+	obj.ay = obj.TotalForce.y / obj.mass * obj.time;
 
 
 	obj.vx += obj.ax * obj.time;
