@@ -245,12 +245,18 @@ void ModulePhysics::ForceSum(square obj, float launchforcex, float launchforcey)
 	float hydrodinamics;
 	float aerodynamics;
 
-	obj.TotalForce.x = 0;
-	obj.TotalForce.y = 0;
+	launchforcex = 50;
+	launchforcey = 50;
+
+	obj.TotalForce.x = launchforcex;
+	obj.TotalForce.y = launchforcey;
 
 	gforce = obj.mass * 9.8f ; //masa * gravedad
 
 	if (isSwamp == true) {
+
+		aerodynamics = 0;
+
 		obj.roce = obj.vy* 0.1f; //drag del awa
 
 		hydrodinamics = (0.3f * 9.8f * 1.75f) - obj.roce; // Densidad agua * Gravedad * Volumen
@@ -264,11 +270,10 @@ void ModulePhysics::ForceSum(square obj, float launchforcex, float launchforcey)
 		aerodynamics = 1 / 2 * obj.density * obj.vy * obj.vy *obj.surface * obj.CDrag; //0.5 * densidad * v*v * Surface * coeficiente 
 	}
 
-	launchforcex = 50;
-	launchforcey = 50;
+	
 
-	obj.TotalForce.x = launchforcex;
-	obj.TotalForce.y = gforce - hydrodinamics - aerodynamics - launchforcey;
+	obj.TotalForce.x += hydrodinamics - aerodynamics;
+	obj.TotalForce.y += gforce - hydrodinamics - aerodynamics ;
 
 }
 
