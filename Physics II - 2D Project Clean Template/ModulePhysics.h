@@ -98,12 +98,15 @@ public:
 		
 	
 	};
-	void ForceSum(square patata,  float launchforcex, float launchforcey);
-	void VelocityVerlet(square obj);
-	void SymplecticEuler(square obj);
-	void ImplicitEuler(square obj);
+	void ForceSum(square &obj,  float launchforcex, float launchforcey);
+	void VelocityVerlet(square &obj);
+	void SymplecticEuler(square &obj);
+	void ImplicitEuler(square &obj);
 public:
 	bool limitFps;
+
+	double dt;
+	float deltaTime;
 private:
 	SDL_Renderer* renderer;
 	SDL_Rect rect;
@@ -134,7 +137,7 @@ private:
 	bool isSwamp;
 	char* integratorName;
 	float yMax;
-	float dt;
+	float hydrodinamics;
 	square obj;
 
 
