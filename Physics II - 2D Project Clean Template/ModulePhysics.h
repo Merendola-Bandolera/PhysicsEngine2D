@@ -102,12 +102,16 @@ public:
 	void VelocityVerlet(square &obj);
 	void SymplecticEuler(square &obj);
 	void ImplicitEuler(square &obj);
+	bool Collide(SDL_Rect& r, SDL_Rect& r2);
+	void CollisionResolution(square &obj, SDL_Rect& r);
 public:
 	bool limitFps;
 
 	double dt;
 	float deltaTime;
 private:
+	SDL_Rect suelo = { 250,588,1100,10 };
+	SDL_Rect suelo2 = { 0,588,150,10 };
 	SDL_Renderer* renderer;
 	SDL_Rect rect;
 	bool debug;

@@ -46,8 +46,8 @@ bool ModulePhysics::Start()
 
 	obj.x = 0;
 	obj.y = 588;
-	obj.w = 10;
-	obj.h = 10;
+	obj.w = 30;
+	obj.h = 25;
 	
 	obj.speed = 1;
 	obj.angle = -45;
@@ -80,7 +80,7 @@ bool ModulePhysics::Start()
 	return true;
 }
 
-// 
+
 update_status ModulePhysics::PreUpdate()
 {
 	static char title;
@@ -176,11 +176,11 @@ update_status ModulePhysics::PreUpdate()
 		VelocityVerlet(obj);		
 	}
 
-	if (obj.y >= 588 && isSwamp == false && obj.x < 150 && obj.x > 250) {
+	/*if (obj.y >= 588 && isSwamp == false && obj.x < 150 && obj.x > 250) {
 		isLaunched = false;
 		obj.vy = 0;
 		obj.y = 588;
-	}
+	}*/
 
 	//CONTROLES
 	if (App->input->GetKey(SDL_SCANCODE_D))
@@ -262,14 +262,38 @@ update_status ModulePhysics::PreUpdate()
 	return UPDATE_CONTINUE;
 }
 
+bool ModulePhysics::Collide(SDL_Rect& r, SDL_Rect& r2)
+{
+	return (r2.x < r.x + r.w &&
+		r2.x + r2.w > r.x &&
+		r2.y < r.y + r.h &&
+		r2.h + r2.y > r.y);
+}
+
 void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey)
 {
 	float gforce;
 
 	float aerodynamics;
 
-	launchforcex = 10;
-	launchforcey = 100;
+	if (Collide(obj.rect, floor.rect))
+	{
+		isSwamp = true;
+	}
+	else if (!Collide(obj.rect, floor.rect)) {
+		isSwamp = false;
+	}
+
+	if (Collide(obj.rect, suelo)) {
+		CollisionResolution(obj, suelo);
+	}
+	if (Collide(obj.rect, suelo2)) {
+		CollisionResolution(obj, suelo2);
+	}
+
+	launchforcex = 10 * cos(obj.angle * 3.1415 / 180);
+	launchforcey = 10 * sin(obj.angle * 3.1415 / 180);
+
 
 	obj.TotalForce.x = launchforcex;
 	obj.TotalForce.y = launchforcey;
@@ -306,6 +330,64 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 	{
 		hydrodinamics = 0;
 	}
+
+
+}
+
+void ModulePhysics::CollisionResolution(square &obj, SDL_Rect &r) {
+	Vector2D objpos;
+	Vector2D rpos;
+	Vector2D diff;
+	objpos.x = obj.x;
+	objpos.y = obj.y;
+
+	rpos.x = r.x;
+	rpos.y = r.y;
+
+	diff.x	= rpos.x - objpos.x;
+	diff.y = rpos.y - objpos.y;
+	int colWidth, colHeight;
+
+	// Calculate collision box
+	if (diff.x > 0) {
+		colWidth = obj.rect.w - diff.x;
+	}
+	else {
+		colWidth = r.w + diff.x;
+	}
+
+	if (diff.y > 0) {
+		colHeight = obj.rect.h - diff.y;
+	}
+	else {
+		colHeight = r.h + diff.y;
+	}
+
+	// Reposition object
+	if (colWidth < colHeight) {
+		// Reposition by X-axis
+		if (diff.x > 0) {
+			obj.x -= colWidth;
+		}
+		else {
+			obj.x += colWidth;
+		}
+
+		obj.vx = -obj.vx * 0.5f;
+	}
+	else {
+		// Reposition by Y-axis
+		if (diff.y > 0) {
+			obj.y -= colHeight;
+		}
+		else {
+			obj.y += colHeight-5;
+		}
+
+		obj.vy = -obj.vy * 0.7f;
+		obj.vx *= 0.5f;
+	}
+
 }
 
 void ModulePhysics::VelocityVerlet(square &obj) {
@@ -314,8 +396,8 @@ void ModulePhysics::VelocityVerlet(square &obj) {
 
 	obj.ay = obj.TotalForce.y / obj.mass;
 
-	obj.x += (obj.vx) * 0.125f + 0.5 * obj.ax *0.125f * 0.125f;
-	obj.y += (obj.vy) * 0.125f + 0.5 * obj.ay *0.125f * 0.125f;
+	obj.x += (obj.vx) * 0.125f + 0.5 * obj.ax * 0.125f * 0.125f;
+	obj.y += (obj.vy) * 0.125f + 0.5 * obj.ay * 0.125f * 0.125f;
 
 	obj.vx += obj.ax * 0.125f;
 	obj.vy += obj.ay * 0.125f;
@@ -358,15 +440,17 @@ update_status ModulePhysics::PostUpdate()
 	
 	SDL_Rect cannon = { 1, 138, 127, 36 };
 	SDL_Rect rueda = { 0, 201, 54, 54 };
-	SDL_Rect suelo = { 0,588,1100,10 };
-	obj.rect = { obj.x, obj.y, obj.w,obj.h };
+	
+	obj.rect = { obj.x, obj.y-25, obj.w,obj.h };
 	App->renderer->Blit(texture2, 0, 0);
 	//App->renderer->DrawQuad(cannon, 255, 255, 255, 255);
 	App->renderer->Blit(texture, playerx, playery -75,&cannon);
 	App->renderer->Blit(texture, playerx, playery - 50, &rueda);
 	
 	App->renderer->DrawQuad(suelo, 0, 255, 0, 255);
+	App->renderer->DrawQuad(suelo2, 0, 255, 0, 255);
 	App->renderer->DrawQuad(floor.rect, 0, 0, 255, 255);
+	App->renderer->DrawQuad(obj.rect, 255, 0, 0, 255);
 	//App->renderer->DrawLine(floor.x, 588, mousex, mousey, 100, 255, 0, 255);
 
 	tspeed = obj.speed;
