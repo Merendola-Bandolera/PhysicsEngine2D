@@ -145,8 +145,11 @@ update_status ModulePhysics::PreUpdate()
 
 	if (App->input->GetKey(SDL_SCANCODE_F))
 	{
-		obj.vx = obj.speed * cos(obj.angle * 3.1415 / 180);
-		obj.vy = obj.speed * sin(obj.angle * 3.1415 / 180);
+		float agnulo = obj.angle;
+		obj.vx = obj.speed * cos(agnulo * 3.1415 / 180);
+		obj.vy = obj.speed * sin(agnulo * 3.1415 / 180);
+		obj.vx *= force;
+		obj.vy *= force;
 		obj.x = playerx+120;
 		obj.y = playery-70;
 		obj.speed = 70;
@@ -193,16 +196,22 @@ update_status ModulePhysics::PreUpdate()
 		obj.angle--;
 	}
 
+	if (App->input->GetKey(SDL_SCANCODE_W))
+	{
+		force+= 0.1f;
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_S))
+	{
+		force-= 0.1f;
+	}
+
 	//if (test.vy <0.1f && test.vy > -0.1f) {
 	//	yMax = test.y;
 	//}
 
 	//HYDRODINAMICS
-	if (obj.x > 150 && obj.x < 250 && obj.y >= 588)
-		isSwamp = true;
-	else {
-		isSwamp = false;
-	}
+	
 	/*if (App->input->GetKey(SDL_SCANCODE_4)) {
 		isSwamp = true;
 	}
@@ -290,9 +299,14 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 	if (Collide(obj.rect, suelo2)) {
 		CollisionResolution(obj, suelo2);
 	}
-
-	launchforcex = 10 * cos(obj.angle * 3.1415 / 180);
-	launchforcey = 10 * sin(obj.angle * 3.1415 / 180);
+	if (Collide(obj.rect, suelo3)) {
+		CollisionResolution(obj, suelo3);
+	}
+	if (Collide(obj.rect, suelo4)) {
+		CollisionResolution(obj, suelo4);
+	}
+	launchforcex = 10 ;
+	launchforcey = 100;
 
 
 	obj.TotalForce.x = launchforcex;
@@ -434,7 +448,7 @@ void ModulePhysics::SymplecticEuler(square &obj) {
 
 	integratorName = "Symplectic Euler";
 }
-// 
+
 update_status ModulePhysics::PostUpdate()
 {
 	
@@ -449,6 +463,8 @@ update_status ModulePhysics::PostUpdate()
 	
 	App->renderer->DrawQuad(suelo, 0, 255, 0, 255);
 	App->renderer->DrawQuad(suelo2, 0, 255, 0, 255);
+	App->renderer->DrawQuad(suelo3, 0, 255, 0, 255);
+	App->renderer->DrawQuad(suelo4, 0, 255, 0, 255);
 	App->renderer->DrawQuad(floor.rect, 0, 0, 255, 255);
 	App->renderer->DrawQuad(obj.rect, 255, 0, 0, 255);
 	//App->renderer->DrawLine(floor.x, 588, mousex, mousey, 100, 255, 0, 255);
