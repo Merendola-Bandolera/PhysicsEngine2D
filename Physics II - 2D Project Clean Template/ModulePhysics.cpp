@@ -59,8 +59,27 @@ bool ModulePhysics::Start()
 	obj.ay = 10;
 	obj.ax = 0;
 	obj.acceleration = 2;
-	obj.mass = 7.5f;
+	obj.mass = 20.5f;
 	obj.roce = 2;
+
+	player.x = 0;
+	player.y = 588;
+	player.w = 30;
+	player.h = 25;
+	player.name = 'p';
+	
+	player.speed = 1;
+	player.angle = -45;
+	player.rect = { player.x, player.y, player.w,player.h };
+	
+	player.vx = player.speed * cos(player.angle * 3.1415 / 180);
+	player.vy = player.speed * sin(player.angle * 3.1415 / 180);
+	
+	player.ay = 10;
+	player.ax = 0;
+	player.acceleration = 2;
+	player.mass = 7.5f;
+	player.roce = 2;
 
 	floor.x = 150;
 	floor.y = 588;
@@ -122,21 +141,27 @@ update_status ModulePhysics::PreUpdate()
 	}
 
 	
-
+	if (!App->input->GetKey(SDL_SCANCODE_LEFT) && !App->input->GetKey(SDL_SCANCODE_LEFT)) {
+		player.ax = 0;
+	}
 
 	if (App->input->GetKey(SDL_SCANCODE_LEFT))
 	{
-		playerx--;
+		//playerx--;
+		player.vx--;
 	}
 
 	if (App->input->GetKey(SDL_SCANCODE_RIGHT))
 	{
-		playerx++;
+		//playerx++;
+		player.vx++;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_SPACE) )
+	if (App->input->GetKey(SDL_SCANCODE_SPACE))
 	{
-		playery--;
+		//playery--;
+		player.ay = 0;
+		player.vy -= 5;
 	}
 	else if (playery < 588)
 	{
@@ -179,11 +204,9 @@ update_status ModulePhysics::PreUpdate()
 		VelocityVerlet(obj);		
 	}
 
-	/*if (obj.y >= 588 && isSwamp == false && obj.x < 150 && obj.x > 250) {
-		isLaunched = false;
-		obj.vy = 0;
-		obj.y = 588;
-	}*/
+	ForceSum(player, 50, 50);
+	VelocityVerlet(player);
+
 
 	//CONTROLES
 	if (App->input->GetKey(SDL_SCANCODE_D))
@@ -206,67 +229,7 @@ update_status ModulePhysics::PreUpdate()
 		force-= 0.1f;
 	}
 
-	//if (test.vy <0.1f && test.vy > -0.1f) {
-	//	yMax = test.y;
-	//}
-
-	//HYDRODINAMICS
 	
-	/*if (App->input->GetKey(SDL_SCANCODE_4)) {
-		isSwamp = true;
-	}
-	if (App->input->GetKey(SDL_SCANCODE_5)) {
-		isSwamp = false;
-	}*/
-	//	//FUERZA BOYANCI
-	//	test.buoyancy += (0.3f * 9.8f * 1.75f) ;
-
-	//	//FUERZA GRAVEDAD
-	//	//test.gravity += test.mass * 9.8f ;
-
-	///*	test.vy += -test.buoyancy;*/
-	//	
-	//	//ROZAMIENTO
-	//	if (test.vy < 0) {
-	//	test.roce += 10 *test.vy ;
-	//	}
-	//	else if (test.vy >= 0) {
-	//	test.roce -= 10*test.vy;
-	//	}
-
-	//	//FUERZA TOTAL = FG + BOUYANCY -ROCE
-	//	//(test.force.y += test.gravity - test.buoyancy + test.roce;
-
-	//	//VELOCIDAD = (Ft/MASA)*TIEMPO
-	//	//test.vy -= (test.force.y / test.mass) * (test.time);
-
-	//	isLaunched = true;
-	//
-	//	
-	//			
-	//}
-	//else {
-	//	isSwamp = false;
-	//	
-	//	test.buoyancy = 0; 
-	//	//ROZAMIENTO
-	//	if (test.vy < 0) {
-	//		test.roce -= 0.1f * test.vy;
-	//	}
-	//	else if (test.vy >= 0) {
-	//		test.roce += 0.1f * test.vy;
-	//	}
-
-
-	//	test.vy += test.ay * test.time;
-	//	test.y += (test.vy) * test.time;
-	//	
-	//}
-
-	//
-
-
-	/*if (!test.Intersects(floor.rect))*/
 
 	return UPDATE_CONTINUE;
 }
@@ -292,7 +255,9 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 	else if (!Collide(obj.rect, floor.rect)) {
 		isSwamp = false;
 	}
-
+	if (Collide(obj.rect, wall)) {
+		CollisionResolution(obj, wall);
+	}
 	if (Collide(obj.rect, suelo)) {
 		CollisionResolution(obj, suelo);
 	}
@@ -318,31 +283,31 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 		
 		obj.TotalForce.x = 0;
 		obj.vx *= 0.9;
-		obj.vy *= 0.9;
+		obj.vy *= 0.92;
 		aerodynamics = 0;
 
 		obj.roce = obj.vy* 0.1f; //drag del awa
 
 		//hydrodinamics += (0.3f * 9.8 * 1.75f) + obj.roce * obj.vy; // Densidad agua * Gravedad * Volumen
-		hydrodinamics += 9.8f * obj.surface * obj.vy;
-		hydrodinamics += obj.roce * obj.vy;
+		obj.hydrodinamics += 9.8f * obj.surface * obj.vy;
+		obj.hydrodinamics += obj.roce * obj.vy;
 	}
 	
 
 	if (isSwamp == false)
 	{
 		
-		hydrodinamics = -hydrodinamics - gforce;
+		obj.hydrodinamics = -obj.hydrodinamics - gforce;
 		aerodynamics = 1 / 2 * obj.density * obj.vy * obj.vy *obj.surface * obj.CDrag; //0.5 * densidad * v*v * Surface * coeficiente 
 	}
 
 	
 
 	obj.TotalForce.x += - aerodynamics;
-	obj.TotalForce.y += gforce - hydrodinamics - aerodynamics ;
+	obj.TotalForce.y += gforce - obj.hydrodinamics - aerodynamics ;
 	if (isSwamp == false)
 	{
-		hydrodinamics = 0;
+		obj.hydrodinamics = 0;
 	}
 
 
@@ -370,13 +335,14 @@ void ModulePhysics::CollisionResolution(square &obj, SDL_Rect &r) {
 		colWidth = r.w + diff.x;
 	}
 
-	if (diff.y > 0) {
-		colHeight = obj.rect.h - diff.y;
-	}
-	else {
-		colHeight = r.h + diff.y;
-	}
-
+	
+		if (diff.y > 0) {
+			colHeight = obj.rect.h - diff.y;
+		}
+		else {
+			colHeight = r.h + diff.y;
+		}
+	
 	// Reposition object
 	if (colWidth < colHeight) {
 		// Reposition by X-axis
@@ -391,13 +357,24 @@ void ModulePhysics::CollisionResolution(square &obj, SDL_Rect &r) {
 	}
 	else {
 		// Reposition by Y-axis
-		if (diff.y > 0) {
-			obj.y -= colHeight;
+		if (obj.name != 'p') {
+			if (diff.y > 0) {
+				obj.y -= colHeight;
+			}
+			else {
+				obj.y += colHeight - 5;
+			}
 		}
 		else {
-			obj.y += colHeight-5;
+			if (diff.y > 0) {
+				obj.y -= colHeight;
+			}
+			else {
+				obj.y += colHeight;
+			}
+			obj.vy = 0;
+			obj.ay = 0;
 		}
-
 		obj.vy = -obj.vy * 0.7f;
 		obj.vx *= 0.5f;
 	}
@@ -456,6 +433,7 @@ update_status ModulePhysics::PostUpdate()
 	SDL_Rect rueda = { 0, 201, 54, 54 };
 	
 	obj.rect = { obj.x, obj.y-25, obj.w,obj.h };
+	player.rect = { player.x, player.y, player.w,player.h };
 	App->renderer->Blit(texture2, 0, 0);
 	//App->renderer->DrawQuad(cannon, 255, 255, 255, 255);
 	App->renderer->Blit(texture, playerx, playery -75,&cannon);
@@ -465,8 +443,10 @@ update_status ModulePhysics::PostUpdate()
 	App->renderer->DrawQuad(suelo2, 0, 255, 0, 255);
 	App->renderer->DrawQuad(suelo3, 0, 255, 0, 255);
 	App->renderer->DrawQuad(suelo4, 0, 255, 0, 255);
+	App->renderer->DrawQuad(wall, 255, 255, 0, 255);
 	App->renderer->DrawQuad(floor.rect, 0, 0, 255, 255);
 	App->renderer->DrawQuad(obj.rect, 255, 0, 0, 255);
+	App->renderer->DrawQuad(player.rect, 0, 255, 0, 255);
 	//App->renderer->DrawLine(floor.x, 588, mousex, mousey, 100, 255, 0, 255);
 
 	tspeed = obj.speed;

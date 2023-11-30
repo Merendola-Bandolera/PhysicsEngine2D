@@ -64,14 +64,14 @@ public:
 		int density;
 		int surface;
 		int CDrag;
-
+		float hydrodinamics;
 		float buoyancy;
 		float roce;
 		float speed;
 		float acceleration;
 		float angle;
 		Vector2D TotalForce;
-
+		char name;
 
 		SDL_Rect rect;
 		float time;
@@ -114,6 +114,7 @@ private:
 	SDL_Rect suelo2 = { 0,588,150,10 };
 	SDL_Rect suelo3 = { 250,598,1100,300 };
 	SDL_Rect suelo4 = { 0,598,150,300 };
+	SDL_Rect wall = { 500,300,10,300 };
 	SDL_Renderer* renderer;
 	SDL_Rect rect;
 	bool debug;
@@ -143,8 +144,8 @@ private:
 	bool isSwamp;
 	char* integratorName;
 	float force = 1;
-	float hydrodinamics;
+	//float hydrodinamics;
 	square obj;
-
+	square player;
 
 };
