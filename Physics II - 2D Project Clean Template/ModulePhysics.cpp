@@ -148,20 +148,20 @@ update_status ModulePhysics::PreUpdate()
 	if (App->input->GetKey(SDL_SCANCODE_LEFT))
 	{
 		//playerx--;
-		player.vx--;
+		player.x--;
 	}
 
 	if (App->input->GetKey(SDL_SCANCODE_RIGHT))
 	{
 		//playerx++;
-		player.vx++;
+		player.x++;
 	}
 
 	if (App->input->GetKey(SDL_SCANCODE_SPACE))
 	{
 		//playery--;
 		player.ay = 0;
-		player.vy -= 5;
+		player.vy = -5;
 	}
 	else if (playery < 588)
 	{
@@ -188,23 +188,23 @@ update_status ModulePhysics::PreUpdate()
 	//INTEGRATOR 1
 	if (isLaunched == true && obj.integrator == 1)
 	{		
-		ForceSum(obj, 50, 50);
+		ForceSum(obj, 10, 100);
 		SymplecticEuler(obj);
 	}
 	//INTEGRATOR 2
 	if (isLaunched == true && obj.integrator == 2)
 	{
-		ForceSum(obj, 50, 50);
+		ForceSum(obj, 10, 100);
 		ImplicitEuler(obj);	
 	}	
 	//INTEGRATOR 3
 	if (isLaunched == true && obj.integrator == 3)
 	{
-		ForceSum(obj, 50, 50);
+		ForceSum(obj, 10, 100);
 		VelocityVerlet(obj);		
 	}
 
-	ForceSum(player, 50, 50);
+	ForceSum(player, 0, 0);
 	VelocityVerlet(player);
 
 
@@ -270,8 +270,7 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 	if (Collide(obj.rect, suelo4)) {
 		CollisionResolution(obj, suelo4);
 	}
-	launchforcex = 10 ;
-	launchforcey = 100;
+	
 
 
 	obj.TotalForce.x = launchforcex;
@@ -374,6 +373,7 @@ void ModulePhysics::CollisionResolution(square &obj, SDL_Rect &r) {
 			}
 			obj.vy = 0;
 			obj.ay = 0;
+			obj.TotalForce.y = 0;
 		}
 		obj.vy = -obj.vy * 0.7f;
 		obj.vx *= 0.5f;
