@@ -61,10 +61,11 @@ bool ModulePhysics::Start()
 	obj.acceleration = 2;
 	obj.mass = 20.5f;
 	obj.roce = 2;
+	obj.name = 'c';
 
 	player.x = 0;
 	player.y = 588;
-	player.w = 30;
+	player.w = 130;
 	player.h = 25;
 	player.name = 'p';
 	
@@ -93,8 +94,6 @@ bool ModulePhysics::Start()
 	tspeed = 100;
 	tay = 10;
 	tax = 0;
-
-	
 
 	return true;
 }
@@ -157,11 +156,12 @@ update_status ModulePhysics::PreUpdate()
 		player.x++;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_SPACE))
+	if (App->input->GetKey(SDL_SCANCODE_SPACE) && player.vy == 0 || App->input->GetKey(SDL_SCANCODE_SPACE) && player.isSwamp == true)
 	{
 		//playery--;
 		player.ay = 0;
-		player.vy = -5;
+		player.vy = -10;
+		player.y -= 10;
 	}
 	else if (playery < 588)
 	{
@@ -175,8 +175,8 @@ update_status ModulePhysics::PreUpdate()
 		obj.vy = obj.speed * sin(agnulo * 3.1415 / 180);
 		obj.vx *= force;
 		obj.vy *= force;
-		obj.x = playerx+120;
-		obj.y = playery-70;
+		obj.x = player.x+120;
+		obj.y = player.y-70 +25;
 		obj.speed = 70;
 		obj.ay = 0;
 		obj.ax = 0;
@@ -250,24 +250,24 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 
 	if (Collide(obj.rect, floor.rect))
 	{
-		isSwamp = true;
+		obj.isSwamp = true;
 	}
 	else if (!Collide(obj.rect, floor.rect)) {
-		isSwamp = false;
+		obj.isSwamp = false;
 	}
 	if (Collide(obj.rect, wall)) {
 		CollisionResolution(obj, wall);
 	}
-	if (Collide(obj.rect, suelo)) {
+	if (Collide(obj.rect, suelo) && obj.name != 'p') {
 		CollisionResolution(obj, suelo);
 	}
-	if (Collide(obj.rect, suelo2)) {
+	if (Collide(obj.rect, suelo2) && obj.name != 'p') {
 		CollisionResolution(obj, suelo2);
 	}
-	if (Collide(obj.rect, suelo3)) {
+	if (Collide(obj.rect, suelo3) && obj.name != 'p') {
 		CollisionResolution(obj, suelo3);
 	}
-	if (Collide(obj.rect, suelo4)) {
+	if (Collide(obj.rect, suelo4) && obj.name != 'p') {
 		CollisionResolution(obj, suelo4);
 	}
 	
@@ -278,7 +278,7 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 
 	gforce = obj.mass * 9.8f ; //masa * gravedad
 
-	if (isSwamp == true) {
+	if (obj.isSwamp == true) {
 		
 		obj.TotalForce.x = 0;
 		obj.vx *= 0.9;
@@ -293,7 +293,7 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 	}
 	
 
-	if (isSwamp == false)
+	if (obj.isSwamp == false)
 	{
 		
 		obj.hydrodinamics = -obj.hydrodinamics - gforce;
@@ -303,8 +303,29 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 	
 
 	obj.TotalForce.x += - aerodynamics;
-	obj.TotalForce.y += gforce - obj.hydrodinamics - aerodynamics ;
-	if (isSwamp == false)
+	obj.TotalForce.y += gforce - obj.hydrodinamics - aerodynamics;
+
+	if (Collide(obj.rect, suelo) && obj.name == 'p' && obj.y != 0) {
+		obj.TotalForce.y = 0;
+		obj.vy = 0;
+		obj.ay = 0;
+	}
+	if (Collide(obj.rect, suelo2) && obj.name == 'p' && obj.y != 0) {
+		obj.TotalForce.y = 0;
+		obj.vy = 0;
+		obj.ay = 0;
+	}
+	if (Collide(obj.rect, suelo3) && obj.name == 'p' && obj.y != 0) {
+		obj.TotalForce.y = 0;
+		obj.vy = 0;
+		obj.ay = 0;
+	}
+	if (Collide(obj.rect, suelo4) && obj.name == 'p' && obj.y != 0) {
+		obj.TotalForce.y = 0;
+		obj.vy = 0;
+		obj.ay = 0;
+	}
+	if (obj.isSwamp == false)
 	{
 		obj.hydrodinamics = 0;
 	}
@@ -392,7 +413,7 @@ void ModulePhysics::VelocityVerlet(square &obj) {
 
 	obj.vx += obj.ax * 0.125f;
 	obj.vy += obj.ay * 0.125f;
-
+	if (obj.name != 'p')
 	integratorName = "Velocity-Verlet";
 }
 void ModulePhysics::ImplicitEuler(square &obj) {
@@ -408,6 +429,7 @@ void ModulePhysics::ImplicitEuler(square &obj) {
 
 	obj.y += obj.vy * 0.125f;
 	obj.vy += obj.ay * 0.125f;
+	if (obj.name != 'p')
 	integratorName = "Implicit Euler";
 }
 void ModulePhysics::SymplecticEuler(square &obj) {
@@ -422,7 +444,7 @@ void ModulePhysics::SymplecticEuler(square &obj) {
 
 	obj.vy += obj.ay * 0.125f;
 	obj.y += obj.vy * 0.125f;
-
+	if (obj.name != 'p')
 	integratorName = "Symplectic Euler";
 }
 
@@ -434,10 +456,12 @@ update_status ModulePhysics::PostUpdate()
 	
 	obj.rect = { obj.x, obj.y-25, obj.w,obj.h };
 	player.rect = { player.x, player.y, player.w,player.h };
+
 	App->renderer->Blit(texture2, 0, 0);
+	App->renderer->DrawQuad(player.rect, 0, 255, 255, 255);
 	//App->renderer->DrawQuad(cannon, 255, 255, 255, 255);
-	App->renderer->Blit(texture, playerx, playery -75,&cannon);
-	App->renderer->Blit(texture, playerx, playery - 50, &rueda);
+	App->renderer->Blit(texture, player.x, player.y -50,&cannon);
+	App->renderer->Blit(texture, player.x, player.y - 25, &rueda);
 	
 	App->renderer->DrawQuad(suelo, 0, 255, 0, 255);
 	App->renderer->DrawQuad(suelo2, 0, 255, 0, 255);
@@ -446,12 +470,12 @@ update_status ModulePhysics::PostUpdate()
 	App->renderer->DrawQuad(wall, 255, 255, 0, 255);
 	App->renderer->DrawQuad(floor.rect, 0, 0, 255, 255);
 	App->renderer->DrawQuad(obj.rect, 255, 0, 0, 255);
-	App->renderer->DrawQuad(player.rect, 0, 255, 0, 255);
+	
 	//App->renderer->DrawLine(floor.x, 588, mousex, mousey, 100, 255, 0, 255);
 
 	tspeed = obj.speed;
-	tx = 0+playerx +120;
-	ty = playery -70;
+	tx = 0+player.x +120;
+	ty = player.y -70+25;
 	tvx = tspeed * cos(obj.angle * 3.1415 / 180);
 	tvy = tspeed * sin(obj.angle * 3.1415 / 180);
 

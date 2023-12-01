@@ -72,7 +72,7 @@ public:
 		float angle;
 		Vector2D TotalForce;
 		char name;
-
+		bool isSwamp;
 		SDL_Rect rect;
 		float time;
 		float vx, vy, ax, ay;
@@ -126,6 +126,7 @@ private:
 	float playerx;
 	float playery;
 
+	
 	float tx;
 	float ty;
 	float ttime;
@@ -141,7 +142,7 @@ private:
 	Animation Ruedas;
 	Animation Canon;
 	Animation* CurrentAnim;
-	bool isSwamp;
+	//bool isSwamp;
 	char* integratorName;
 	float force = 1;
 	//float hydrodinamics;
