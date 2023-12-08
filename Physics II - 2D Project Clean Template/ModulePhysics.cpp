@@ -4,12 +4,13 @@
 #include "math.h"
 #include "ModuleRender.h"
 #include "ModuleInput.h"
+#include "ModuleAudio.h"
 #include "Fps.h"
 #include "ModuleSceneIntro.h"
 
 ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
-	debug = true;
+	debug = false;
 }
 
 // Destructor
@@ -22,8 +23,17 @@ bool ModulePhysics::Start()
 	LOG("Creating Physics 2D environment");
 
 	texture = App->textures->Load("../Assets/Spritesheet.png");
-	texture2 = App->textures->Load("../Assets/fondo.png");
-	texture3 = App->textures->Load("../Assets/bomba.png");
+	texture2 = App->textures->Load("../Assets/fondowater.png");
+	texture3 = App->textures->Load("../Assets/corcho.png");
+	texture4 = App->textures->Load("../Assets/player1.png");
+	texture5 = App->textures->Load("../Assets/player2 (1).png");
+	texture6 = App->textures->Load("../Assets/short platform.png");
+	texture7 = App->textures->Load("../Assets/long platform.png");
+	texture8 = App->textures->Load("../Assets/vertical platform.png");
+	texture9 = App->textures->Load("../Assets/player1win.png");
+	texture10 = App->textures->Load("../Assets/player2win.png");
+
+	
 
 	Explosion.PushBack({0, 0, 85, 69});
 	Explosion.PushBack({84, 0, 85, 69});
@@ -64,7 +74,7 @@ bool ModulePhysics::Start()
 	obj.name = 'c';
 
 	player.x = 0;
-	player.y = 588;
+	player.y = 250;
 	player.w = 130;
 	player.h = 25;
 	player.name = 'p';
@@ -82,9 +92,28 @@ bool ModulePhysics::Start()
 	player.mass = 7.5f;
 	player.roce = 2;
 
-	floor.x = 150;
+	player2.x = 850;
+	player2.y = 350;
+	player2.w = 130;
+	player2.h = 25;
+	player2.name = 'p';
+
+	player2.speed = 1;
+	player2.angle = -45;
+	player2.rect = { player.x, player.y, player.w,player.h };
+
+	player2.vx = player.speed * cos(player.angle * 3.1415 / 180);
+	player2.vy = player.speed * sin(player.angle * 3.1415 / 180);
+
+	player2.ay = 10;
+	player2.ax = 0;
+	player2.acceleration = 2;
+	player2.mass = 7.5f;
+	player2.roce = 2;
+
+	floor.x = 0;
 	floor.y = 588;
-	floor.w = 100;
+	floor.w = 1100;
 	floor.h = 1000;
 	
 	floor.rect = { floor.x, floor.y, floor.w,floor.h };
@@ -126,6 +155,16 @@ update_status ModulePhysics::PreUpdate()
 		}
 	}
 
+	if (App->input->GetKey(SDL_SCANCODE_F2) == KEY_DOWN)
+	{
+		if (gravity == true) {
+			gravity = false;
+		}
+		else {
+			gravity = true;
+		}
+	}
+
 
 	if (App->input->GetKey(SDL_SCANCODE_1)) {
 		obj.integrator = 1;
@@ -140,43 +179,94 @@ update_status ModulePhysics::PreUpdate()
 	}
 
 	
-	if (!App->input->GetKey(SDL_SCANCODE_LEFT) && !App->input->GetKey(SDL_SCANCODE_LEFT)) {
+	if (!App->input->GetKey(SDL_SCANCODE_LEFT) && !App->input->GetKey(SDL_SCANCODE_LEFT) && playerTurn == 0) {
 		player.ax = 0;
+
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_LEFT))
+	if (App->input->GetKey(SDL_SCANCODE_LEFT) && playerTurn == 0 && player.fuel > 0)
 	{
 		//playerx--;
 		player.x--;
+		player.fuel -= 0.5f;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_RIGHT))
+	if (App->input->GetKey(SDL_SCANCODE_RIGHT) && playerTurn == 0 && player.x <= 900 && player.fuel > 0)
 	{
 		//playerx++;
 		player.x++;
+		player.fuel -= 0.5f;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_SPACE) && player.vy == 0 || App->input->GetKey(SDL_SCANCODE_SPACE) && player.isSwamp == true)
+	player.jumpcd++;
+	player.jumping = false;
+	player2.jumpcd++;
+	player2.jumping = false;
+
+	if (App->input->GetKey(SDL_SCANCODE_SPACE) && player.vy == 0 && playerTurn == 0 || App->input->GetKey(SDL_SCANCODE_SPACE) && player.isSwamp == true && playerTurn == 0 && player.jumpcd > 30)
 	{
 		//playery--;
-		player.ay = 0;
-		player.vy = -10;
-		player.y -= 10;
-	}
-	else if (playery < 588)
-	{
-		playery++;
+        player.ay = 0;
+		player.vy = -130;
+		player.y -= 0;
+		player.jumping = true;
+		player.jumpcd = 0;
+		
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_F))
+	if (!App->input->GetKey(SDL_SCANCODE_LEFT) && !App->input->GetKey(SDL_SCANCODE_LEFT) && playerTurn == 1) {
+		player2.ax = 0;
+
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_LEFT) && playerTurn == 1 && player2.fuel > 0)
 	{
+		//playerx--;
+		player2.x--;
+		player2.fuel -= 0.5f;
+	}
+
+	if (App->input->GetKey(SDL_SCANCODE_RIGHT) && playerTurn == 1 && player2.x <= 900 && player2.fuel > 0)
+	{
+		//playerx++;
+		player2.x++;
+		player2.fuel -= 0.5f;
+	}
+
+	
+
+	if (App->input->GetKey(SDL_SCANCODE_SPACE) && player2.vy == 0 && playerTurn == 1 || App->input->GetKey(SDL_SCANCODE_SPACE) && player2.isSwamp == true && playerTurn == 1 && player2.jumpcd >30)
+	{
+		//playery--;
+		player2.ay = 0;
+		player2.vy = -130;
+		player2.y -= 0;
+		player2.jumping = true;
+		player2.jumpcd = 0;
+			  
+		player2.jumping = true;
+	}
+	
+	if (App->input->GetKey(SDL_SCANCODE_F) && playerShot == false)
+	{
+		playerCharge = 0;
+		playerSwap = 0;
+		playerShot = true;
+		App->audio->PlayFx(App->audio->LoadFx("../Assets/bottle1.wav"), 0);
+	}
+	
+	if (playerShot == true ) {
+		playerCharge++;
+		playerSwap++;
+	}
+	if (playerCharge <= 20 && playerTurn == 0) {
 		float agnulo = obj.angle;
 		obj.vx = obj.speed * cos(agnulo * 3.1415 / 180);
 		obj.vy = obj.speed * sin(agnulo * 3.1415 / 180);
 		obj.vx *= force;
 		obj.vy *= force;
-		obj.x = player.x+120;
-		obj.y = player.y-70 +25;
+		obj.x = player.x + 120;
+		obj.y = player.y - 70 + 25;
 		obj.speed = 70;
 		obj.ay = 0;
 		obj.ax = 0;
@@ -184,7 +274,47 @@ update_status ModulePhysics::PreUpdate()
 		isLaunched = true;
 
 	}
-	
+
+	if (playerSwap >= 200 && playerTurn == 0) {
+		playerShot = false;
+		playerTurn = 1;
+		playerSwap = 0;
+		player.fuel = 100;
+	}
+
+
+	if (playerCharge <= 20 && playerTurn == 1) {
+		float agnulo = obj.angle;
+		obj.vx = obj.speed * cos(agnulo * 3.1415 / 180);
+		obj.vy = obj.speed * sin(agnulo * 3.1415 / 180);
+		obj.vx *= force;
+		obj.vy *= force;
+		obj.x = player2.x;
+		obj.y = player2.y - 70 + 25;
+		obj.speed = 70;
+		obj.ay = 0;
+		obj.ax = 0;
+		obj.time = 0;
+		isLaunched = true;
+		playerShot = true;
+		
+	}
+
+	if (playerSwap >= 200 && playerTurn == 1) {
+		playerShot = false;
+		playerTurn = 0;
+		playerSwap = 0;
+		player2.fuel = 100;
+	}
+
+
+	//if (obj.vy == 0 && obj.vx == 0 && playerTurn == 0) {
+	//	playerTurn = 1;
+	//}
+
+	//if (obj.vy == 0 && obj.vx == 0 && playerTurn == 1) {
+	//	playerTurn = 0;
+	//}
 	//INTEGRATOR 1
 	if (isLaunched == true && obj.integrator == 1)
 	{		
@@ -204,8 +334,36 @@ update_status ModulePhysics::PreUpdate()
 		VelocityVerlet(obj);		
 	}
 
+	if (player.jumping == false)
 	ForceSum(player, 0, 0);
+		
+
 	VelocityVerlet(player);
+
+	if (player2 .jumping == false)
+	ForceSum(player2, 0, 0);
+
+	VelocityVerlet(player2);
+
+	if (Collide(obj.rect, player.rect)) 
+	{
+		obj.ax = 0;
+		obj.ay = 0;
+		obj.vy = 0;
+		obj.vx = 0;
+		obj.x = 1400;
+		obj.y = 400;
+		player.hp -= 1;
+	}
+	if (Collide(obj.rect, player2.rect )) {
+		obj.ax = 0;
+		obj.ay = 0;
+		obj.vy = 0;
+		obj.vx = 0;
+		obj.x = 1400;
+		obj.y = 400;
+		player2.hp -= 1;
+	}
 
 
 	//CONTROLES
@@ -219,14 +377,14 @@ update_status ModulePhysics::PreUpdate()
 		obj.angle--;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_W))
+	if (App->input->GetKey(SDL_SCANCODE_W) && force <= 1.5f)
 	{
-		force+= 0.1f;
+		force+= 0.025f;
 	}
 
-	if (App->input->GetKey(SDL_SCANCODE_S))
+	if (App->input->GetKey(SDL_SCANCODE_S)&& force >= 0)
 	{
-		force-= 0.1f;
+		force-= 0.025f;
 	}
 
 	
@@ -258,6 +416,27 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 	if (Collide(obj.rect, wall)) {
 		CollisionResolution(obj, wall);
 	}
+	if (Collide(obj.rect, wall3)) {
+		CollisionResolution(obj, wall3);
+	}
+	if (Collide(obj.rect, wall4)) {
+		CollisionResolution(obj, wall4);
+	}
+	if (Collide(obj.rect, wall5)) {
+		CollisionResolution(obj, wall5);
+	}
+	if (Collide(obj.rect, wall6)) {
+		CollisionResolution(obj, wall6);
+	}
+	if (Collide(obj.rect, wall7)) {
+		CollisionResolution(obj, wall7);
+	}
+	if (Collide(obj.rect, wall8)) {
+		CollisionResolution(obj, wall8);
+	}
+	if (Collide(obj.rect, wall9)) {
+		CollisionResolution(obj, wall9);
+	}
 	if (Collide(obj.rect, suelo) && obj.name != 'p') {
 		CollisionResolution(obj, suelo);
 	}
@@ -267,9 +446,12 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 	if (Collide(obj.rect, suelo3) && obj.name != 'p') {
 		CollisionResolution(obj, suelo3);
 	}
+	/*if (Collide(obj.rect, suelo3) && obj.name != 'p') {
+		CollisionResolution(obj, suelo3);
+	}
 	if (Collide(obj.rect, suelo4) && obj.name != 'p') {
 		CollisionResolution(obj, suelo4);
-	}
+	}*/
 	
 
 
@@ -278,14 +460,14 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 
 	gforce = obj.mass * 9.8f ; //masa * gravedad
 
-	if (obj.isSwamp == true) {
+	if (obj.isSwamp == true && gravity == false) {
 		
 		obj.TotalForce.x = 0;
-		obj.vx *= 0.9;
+		obj.vx *= 0.94;
 		obj.vy *= 0.92;
 		aerodynamics = 0;
 
-		obj.roce = obj.vy* 0.1f; //drag del awa
+		obj.roce = /*obj.vy**/ 0.8f; //drag del awa
 
 		//hydrodinamics += (0.3f * 9.8 * 1.75f) + obj.roce * obj.vy; // Densidad agua * Gravedad * Volumen
 		obj.hydrodinamics += 9.8f * obj.surface * obj.vy;
@@ -301,9 +483,14 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 	}
 
 	
-
+		if (gravity == false)
 	obj.TotalForce.x += - aerodynamics;
-	obj.TotalForce.y += gforce - obj.hydrodinamics - aerodynamics;
+	obj.TotalForce.y += gforce - obj.hydrodinamics ;
+
+	if (gravity) {
+		obj.TotalForce.y = 0;
+		
+	}
 
 	if (Collide(obj.rect, suelo) && obj.name == 'p' && obj.y != 0) {
 		obj.TotalForce.y = 0;
@@ -320,11 +507,7 @@ void ModulePhysics::ForceSum(square &obj, float launchforcex, float launchforcey
 		obj.vy = 0;
 		obj.ay = 0;
 	}
-	if (Collide(obj.rect, suelo4) && obj.name == 'p' && obj.y != 0) {
-		obj.TotalForce.y = 0;
-		obj.vy = 0;
-		obj.ay = 0;
-	}
+
 	if (obj.isSwamp == false)
 	{
 		obj.hydrodinamics = 0;
@@ -373,6 +556,7 @@ void ModulePhysics::CollisionResolution(square &obj, SDL_Rect &r) {
 			obj.x += colWidth;
 		}
 
+		if (obj.name != 'p')
 		obj.vx = -obj.vx * 0.5f;
 	}
 	else {
@@ -456,28 +640,79 @@ update_status ModulePhysics::PostUpdate()
 	
 	obj.rect = { obj.x, obj.y-25, obj.w,obj.h };
 	player.rect = { player.x, player.y, player.w,player.h };
+	player2.rect = { player2.x, player2.y, player2.w,player2.h };
 
 	App->renderer->Blit(texture2, 0, 0);
-	App->renderer->DrawQuad(player.rect, 0, 255, 255, 255);
+	//App->renderer->DrawQuad(player.rect, 0, 255, 255, 255);
 	//App->renderer->DrawQuad(cannon, 255, 255, 255, 255);
-	App->renderer->Blit(texture, player.x, player.y -50,&cannon);
+	App->renderer->Blit(texture4, player.x, player.y -75);
 	App->renderer->Blit(texture, player.x, player.y - 25, &rueda);
+	App->renderer->Blit(texture, player.x +76, player.y - 25, &rueda);
+	App->renderer->Blit(texture5, player2.x, player2.y - 75);
+	App->renderer->Blit(texture, player2.x + 76, player2.y - 25, &rueda);
+	App->renderer->Blit(texture, player2.x, player2.y - 25, &rueda);
+
+
+	App->renderer->Blit(texture8, wall.x, wall.y);
+	App->renderer->Blit(texture8, wall.x, wall.y+wall.h/2+7);
+	App->renderer->Blit(texture8, wall.x, wall.y + wall.h + 14);
+
+	App->renderer->Blit(texture8, wall4.x-20, wall4.y + wall4.h/2 + 30);
+	App->renderer->Blit(texture8, wall4.x-20, wall4.y + wall4.h + 30);
+	App->renderer->Blit(texture8, wall4.x-20, wall4.y);
+
+	App->renderer->Blit(texture8, wall6.x - 20, wall6.y + wall6.h / 2 + 30);
+	App->renderer->Blit(texture8, wall6.x - 20, wall6.y + wall6.h + 30);
+	App->renderer->Blit(texture8, wall6.x - 20, wall6.y);
+
+	App->renderer->Blit(texture8, wall8.x, wall8.y + wall8.h / 2 + 30);
+	App->renderer->Blit(texture8, wall8.x, wall8.y + wall8.h + 30);
+	App->renderer->Blit(texture8, wall8.x, wall8.y);
+
+
+	App->renderer->Blit(texture6,suelo.x,suelo.y, 0, 255, 0, 255);
+	App->renderer->Blit(texture7, suelo2.x, suelo2.y, 0, 255, 0, 255);
+	App->renderer->Blit(texture7, suelo3.x, suelo3.y, 0, 255, 0, 255);
+
+	if (debug) {
+
 	
 	App->renderer->DrawQuad(suelo, 0, 255, 0, 255);
 	App->renderer->DrawQuad(suelo2, 0, 255, 0, 255);
 	App->renderer->DrawQuad(suelo3, 0, 255, 0, 255);
-	App->renderer->DrawQuad(suelo4, 0, 255, 0, 255);
 	App->renderer->DrawQuad(wall, 255, 255, 0, 255);
+	App->renderer->DrawQuad(wall3, 255, 255, 0, 255);
+
+	App->renderer->DrawQuad(wall5, 255, 255, 0, 255);
+	App->renderer->DrawQuad(wall4, 255, 255, 0, 255);
+
+	App->renderer->DrawQuad(wall6, 255, 255, 0, 255);
+	App->renderer->DrawQuad(wall7, 255, 255, 0, 255);
+
+	App->renderer->DrawQuad(wall8, 255, 255, 0, 255);
+	App->renderer->DrawQuad(wall9, 255, 255, 0, 255);
 	App->renderer->DrawQuad(floor.rect, 0, 0, 255, 255);
 	App->renderer->DrawQuad(obj.rect, 255, 0, 0, 255);
+	}
 	
 	//App->renderer->DrawLine(floor.x, 588, mousex, mousey, 100, 255, 0, 255);
 
-	tspeed = obj.speed;
-	tx = 0+player.x +120;
-	ty = player.y -70+25;
-	tvx = tspeed * cos(obj.angle * 3.1415 / 180);
-	tvy = tspeed * sin(obj.angle * 3.1415 / 180);
+
+	if (playerTurn == 0) {
+		tspeed = obj.speed;
+		tx = 0 + player.x + 120;
+		ty = player.y - 70 + 25;
+		tvx = tspeed * cos(obj.angle * 3.1415 / 180);
+		tvy = tspeed * sin(obj.angle * 3.1415 / 180);
+	}
+
+	if (playerTurn == 1) {
+		tspeed = obj.speed;
+		tx = 0 + player2.x ;
+		ty = player2.y - 70 + 25;
+		tvx = tspeed * cos(obj.angle * 3.1415 / 180);
+		tvy = tspeed * sin(obj.angle * 3.1415 / 180);
+	}
 
 	
 	
@@ -493,10 +728,17 @@ update_status ModulePhysics::PostUpdate()
 	}
 
 
+	if (player.hp <= 0) {
+		App->renderer->Blit(texture10, 0, 0);
+	}
+	if (player2.hp <= 0) {
+		App->renderer->Blit(texture9, 0, 0);
+	}
+
 	//App->renderer->DrawQuad(test.rect, 255, 0, 255, 255);
-	App->renderer->Blit(texture3, obj.x-70, obj.y-90);
+	App->renderer->Blit(texture3, obj.x, obj.y-32);
 	char buffer[200];
-	sprintf_s(buffer, "Integrator: %s ",integratorName); // Format the string
+	sprintf_s(buffer, "Player1: HP %d Fuel %.1f      Player2: HP %d Fuel %.1f,           Integrator: %s , Locked FPS: %d, PlayerTurn: %d, ShotForce: %.1f, ShotAngle: %.1f", player.hp, player.fuel, player2.hp, player2.fuel,integratorName,limitFps,playerTurn,force,obj.angle); // Format the string
 
 	char* myCharPointer = _strdup(buffer); // Allocate memory and copy the string
 
